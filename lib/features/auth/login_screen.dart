@@ -1,22 +1,99 @@
 import 'package:flutter/material.dart';
-import 'signup_screen.dart';
-import 'forgotpassword_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
-class LoginScreen extends StatelessWidget {
+import '../dashboard/dashboard_screen.dart';
+import 'forgotpassword_screen.dart';
+import 'signup_screen.dart';
+import 'services/auth_service.dart';
+
+class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
+
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+
+  final AuthService _authService = AuthService();
+
+  bool isLoading = false;
+
+  Future<void> loginUser() async {
+    if (emailController.text.trim().isEmpty ||
+        passwordController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Please enter email and password"),
+        ),
+      );
+      return;
+    }
+
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      await _authService.login(
+        email: emailController.text.trim(),
+        password: passwordController.text.trim(),
+      );
+
+      if (!mounted) return;
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) => const DashboardScreen(),
+        ),
+      );
+    } on FirebaseAuthException catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("${e.code}\n${e.message}"),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.toString()),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+          padding: const EdgeInsets.symmetric(
+            horizontal: 24,
+            vertical: 20,
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const SizedBox(height: 50),
 
-              // Logo
               const Icon(
                 Icons.fitness_center,
                 size: 90,
@@ -25,7 +102,6 @@ class LoginScreen extends StatelessWidget {
 
               const SizedBox(height: 20),
 
-              // Title
               const Text(
                 "Welcome Back!",
                 textAlign: TextAlign.center,
@@ -48,8 +124,8 @@ class LoginScreen extends StatelessWidget {
 
               const SizedBox(height: 40),
 
-              // Email Field
               TextField(
+                controller: emailController,
                 keyboardType: TextInputType.emailAddress,
                 decoration: InputDecoration(
                   labelText: "Email",
@@ -63,8 +139,8 @@ class LoginScreen extends StatelessWidget {
 
               const SizedBox(height: 20),
 
-              // Password Field
               TextField(
+                controller: passwordController,
                 obscureText: true,
                 decoration: InputDecoration(
                   labelText: "Password",
@@ -78,7 +154,6 @@ class LoginScreen extends StatelessWidget {
 
               const SizedBox(height: 10),
 
-              // Forgot Password
               Align(
                 alignment: Alignment.centerRight,
                 child: TextButton(
@@ -86,7 +161,7 @@ class LoginScreen extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const ForgotPasswordScreen(),
+                        builder: (_) => const ForgotPasswordScreen(),
                       ),
                     );
                   },
@@ -94,15 +169,12 @@ class LoginScreen extends StatelessWidget {
                 ),
               ),
 
-              const SizedBox(height: 10),
+              const SizedBox(height: 20),
 
-              // Login Button
               SizedBox(
                 height: 55,
                 child: ElevatedButton(
-                  onPressed: () {
-                    // Login Logic
-                  },
+                  onPressed: isLoading ? null : loginUser,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.green,
                     foregroundColor: Colors.white,
@@ -110,19 +182,22 @@ class LoginScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  child: const Text(
-                    "Login",
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                  child: isLoading
+                      ? const CircularProgressIndicator(
+                          color: Colors.white,
+                        )
+                      : const Text(
+                          "Login",
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                 ),
               ),
 
               const SizedBox(height: 30),
 
-              // Divider
               Row(
                 children: const [
                   Expanded(child: Divider()),
@@ -136,27 +211,25 @@ class LoginScreen extends StatelessWidget {
 
               const SizedBox(height: 30),
 
-              // Google Login Button
               SizedBox(
                 height: 55,
                 child: OutlinedButton.icon(
-                  onPressed: () {},
-                  icon: const Icon(Icons.g_mobiledata, size: 30),
+                  onPressed: () {
+                    // Google Sign-In (Later)
+                  },
+                  icon: const Icon(
+                    Icons.g_mobiledata,
+                    size: 30,
+                  ),
                   label: const Text(
                     "Continue with Google",
                     style: TextStyle(fontSize: 16),
-                  ),
-                  style: OutlinedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
                   ),
                 ),
               ),
 
               const SizedBox(height: 30),
 
-              // Create Account
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -169,7 +242,7 @@ class LoginScreen extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => SignupScreen(),
+                          builder: (_) => const SignupScreen(),
                         ),
                       );
                     },
@@ -182,8 +255,6 @@ class LoginScreen extends StatelessWidget {
                   ),
                 ],
               ),
-
-              const SizedBox(height: 20),
             ],
           ),
         ),
