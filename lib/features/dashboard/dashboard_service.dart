@@ -1,10 +1,14 @@
-import '../profile/profile_model.dart';
-import '../profile/profile_service.dart';
+import '../../models/dashboard_stats.dart';
 
 class DashboardService {
-  final ProfileService _profileService = ProfileService();
-
-  Future<UserProfile?> getUserProfile() async {
-    return await _profileService.getProfile();
+  Future<DashboardStats> loadDashboard() async {
+    return DashboardStats(
+      caloriesConsumed: 0,
+      calorieGoal: 2200,
+      waterConsumed: 0,
+      waterGoal: 3,
+      steps: 0,
+      streak: 1,
+    );
   }
 }

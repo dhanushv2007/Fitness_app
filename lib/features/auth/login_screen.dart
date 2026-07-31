@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import '../dashboard/dashboard_screen.dart';
+import '../profile/profile_service.dart';
+import '../profile/profile_setup_screen.dart';
 import 'forgotpassword_screen.dart';
 import 'signup_screen.dart';
 import 'services/auth_service.dart';
@@ -18,6 +20,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController passwordController = TextEditingController();
 
   final AuthService _authService = AuthService();
+  final ProfileService _profileService = ProfileService();
 
   bool isLoading = false;
 
@@ -42,18 +45,29 @@ class _LoginScreenState extends State<LoginScreen> {
         password: passwordController.text.trim(),
       );
 
+      final profile = await _profileService.getProfile();
+
       if (!mounted) return;
 
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (_) => const DashboardScreen(),
-        ),
-      );
+      if (profile == null) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => const ProfileSetupScreen(),
+          ),
+        );
+      } else {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => const DashboardScreen(),
+          ),
+        );
+      }
     } on FirebaseAuthException catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text("${e.code}\n${e.message}"),
+          content: Text(e.message ?? "Login failed"),
           backgroundColor: Colors.red,
         ),
       );
@@ -215,7 +229,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 height: 55,
                 child: OutlinedButton.icon(
                   onPressed: () {
-                    // Google Sign-In (Later)
+                    // Google Sign-In (Coming Soon)
                   },
                   icon: const Icon(
                     Icons.g_mobiledata,

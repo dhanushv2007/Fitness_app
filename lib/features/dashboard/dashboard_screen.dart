@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -17,7 +18,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
   final ProfileService _profileService = ProfileService();
 
   UserProfile? userProfile;
-
   bool isLoading = true;
 
   @override
@@ -29,20 +29,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Future<void> loadProfile() async {
     try {
       final profile = await _profileService.getProfile();
-
       if (!mounted) return;
-
       setState(() {
         userProfile = profile;
         isLoading = false;
       });
     } catch (e) {
       if (!mounted) return;
-
-      setState(() {
-        isLoading = false;
-      });
-
+      setState(() => isLoading = false);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Error: $e")),
       );
@@ -51,36 +45,39 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   double calculateBMI() {
     if (userProfile == null) return 0;
-
-    double heightInMeters = userProfile!.height / 100;
-
-    return userProfile!.weight /
-        (heightInMeters * heightInMeters);
+    final h = userProfile!.height / 100;
+    return userProfile!.weight / (h * h);
   }
 
   String greeting() {
     final hour = DateTime.now().hour;
-
-    if (hour < 12) {
-      return "Good Morning";
-    } else if (hour < 17) {
-      return "Good Afternoon";
-    } else {
-      return "Good Evening";
-    }
+    if (hour < 12) return "Good Morning";
+    if (hour < 17) return "Good Afternoon";
+    return "Good Evening";
   }
 
   Future<void> logout() async {
     await FirebaseAuth.instance.signOut();
-
     if (!mounted) return;
-
     Navigator.pushAndRemoveUntil(
       context,
-      MaterialPageRoute(
-        builder: (_) => const LoginScreen(),
+      MaterialPageRoute(builder: (_) => const LoginScreen()),
+      (_) => false,
+    );
+  }
+
+  Widget mealCard(IconData icon, String title, Color color) {
+    return Card(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: ListTile(
+        leading: CircleAvatar(
+          backgroundColor: color.withOpacity(.15),
+          child: Icon(icon, color: color),
+        ),
+        title: Text(title),
+        subtitle: const Text("No meal added"),
+        trailing: const Icon(Icons.add_circle_outline),
       ),
-      (route) => false,
     );
   }
 
@@ -88,184 +85,93 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget build(BuildContext context) {
     if (isLoading) {
       return const Scaffold(
-        body: Center(
-          child: CircularProgressIndicator(),
-        ),
+        body: Center(child: CircularProgressIndicator()),
       );
     }
 
     return Scaffold(
-      backgroundColor: const Color(0xffF7F8FA),
-
+      backgroundColor: const Color(0xffF5F7FA),
       appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-        title: const Text(
-          "Fitness Tracker",
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
+        title: const Text("Fitness Tracker"),
         actions: [
           IconButton(
-            icon: const Icon(Icons.logout),
             onPressed: logout,
-          ),
+            icon: const Icon(Icons.logout),
+          )
         ],
       ),
-
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
-
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-
-            children: [
-
-              Text(
-                "${greeting()} 👋",
-                style: const TextStyle(
-                  fontSize: 18,
-                  color: Colors.grey,
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(22),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(24),
+                gradient: const LinearGradient(
+                  colors: [Color(0xff43A047), Color(0xff2E7D32)],
                 ),
               ),
-
-              const SizedBox(height: 5),
-
-              Text(
-                userProfile?.name ?? "User",
-                style: const TextStyle(
-                  fontSize: 30,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-
-              const SizedBox(height: 8),
-
-              const Text(
-                "Let's achieve your fitness goals today 💪",
-                style: TextStyle(
-                  color: Colors.grey,
-                ),
-              ),
-
-              const SizedBox(height: 30),
-
-              GridView.count(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                crossAxisCount: 2,
-                crossAxisSpacing: 15,
-                mainAxisSpacing: 15,
-                childAspectRatio: 1.15,
-
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-
-                  DashboardCard(
-                    title: "Calories",
-                    value: "2200 kcal",
-                    icon: Icons.local_fire_department,
-                    color: Colors.orange,
+                  Text("${greeting()} 👋",
+                      style: const TextStyle(color: Colors.white70)),
+                  const SizedBox(height: 6),
+                  Text(
+                    userProfile?.name ?? "User",
+                    style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 30),
                   ),
-
-                  DashboardCard(
-                    title: "Water",
-                    value: "0 / 3 L",
-                    icon: Icons.water_drop,
-                    color: Colors.blue,
-                  ),
-
-                  DashboardCard(
-                    title: "Weight",
-                    value:
-                        "${userProfile?.weight.toStringAsFixed(1) ?? "0"} kg",
-                    icon: Icons.monitor_weight,
-                    color: Colors.green,
-                  ),
-
-                  DashboardCard(
-                    title: "BMI",
-                    value: calculateBMI().toStringAsFixed(1),
-                    icon: Icons.favorite,
-                    color: Colors.red,
+                  const SizedBox(height: 8),
+                  const Text(
+                    "Let's achieve your fitness goals today 💪",
+                    style: TextStyle(color: Colors.white70),
                   ),
                 ],
               ),
-
-              const SizedBox(height: 30),
-
-              const Text(
-                "Today's Meals",
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                ),
+            ),
+            const SizedBox(height: 24),
+            GridView.count(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              crossAxisCount: 2,
+              crossAxisSpacing: 15,
+              mainAxisSpacing: 15,
+              children: [
+                DashboardCard(title:"Calories",value:"0 / 2200 kcal",icon:Icons.local_fire_department,color:Colors.orange),
+                DashboardCard(title:"Water",value:"0 / 3 L",icon:Icons.water_drop,color:Colors.blue),
+                DashboardCard(title:"Weight",value:"${userProfile?.weight.toStringAsFixed(1) ?? "0"} kg",icon:Icons.monitor_weight,color:Colors.green),
+                DashboardCard(title:"BMI",value:calculateBMI().toStringAsFixed(1),icon:Icons.favorite,color:Colors.red),
+                DashboardCard(title:"Steps",value:"0",icon:Icons.directions_walk,color:Colors.deepPurple),
+                DashboardCard(title:"Streak",value:"1 Day",icon:Icons.emoji_events,color:Colors.amber),
+              ],
+            ),
+            const SizedBox(height:24),
+            const Text("Today's Meals",style:TextStyle(fontSize:22,fontWeight:FontWeight.bold)),
+            const SizedBox(height:12),
+            mealCard(Icons.free_breakfast,"Breakfast",Colors.orange),
+            mealCard(Icons.lunch_dining,"Lunch",Colors.green),
+            mealCard(Icons.dinner_dining,"Dinner",Colors.blue),
+            mealCard(Icons.cookie,"Snacks",Colors.deepPurple),
+            const SizedBox(height:24),
+            const Text("Today's Workout",style:TextStyle(fontSize:22,fontWeight:FontWeight.bold)),
+            const SizedBox(height:12),
+            Card(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              child: const ListTile(
+                leading: Icon(Icons.fitness_center),
+                title: Text("No Workout Added"),
+                subtitle: Text("Tap to add today's workout"),
+                trailing: Icon(Icons.chevron_right),
               ),
-
-              const SizedBox(height: 15),
-
-              Card(
-                child: ListTile(
-                  leading: const Icon(Icons.free_breakfast),
-                  title: const Text("Breakfast"),
-                  trailing: const Icon(Icons.add),
-                  onTap: () {},
-                ),
-              ),
-
-              Card(
-                child: ListTile(
-                  leading: const Icon(Icons.lunch_dining),
-                  title: const Text("Lunch"),
-                  trailing: const Icon(Icons.add),
-                  onTap: () {},
-                ),
-              ),
-
-              Card(
-                child: ListTile(
-                  leading: const Icon(Icons.dinner_dining),
-                  title: const Text("Dinner"),
-                  trailing: const Icon(Icons.add),
-                  onTap: () {},
-                ),
-              ),
-
-              Card(
-                child: ListTile(
-                  leading: const Icon(Icons.cookie),
-                  title: const Text("Snacks"),
-                  trailing: const Icon(Icons.add),
-                  onTap: () {},
-                ),
-              ),
-
-              const SizedBox(height: 30),
-
-              const Text(
-                "Today's Workout",
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-
-              const SizedBox(height: 15),
-
-              Card(
-                child: ListTile(
-                  leading: const Icon(Icons.fitness_center),
-                  title: const Text("No workout added"),
-                  subtitle: const Text(
-                    "Tap to add today's workout",
-                  ),
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () {},
-                ),
-              ),
-
-              const SizedBox(height: 30),
-            ],
-          ),
+            ),
+            const SizedBox(height:30),
+          ],
         ),
       ),
     );

@@ -3,7 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 
 import 'firebase_options.dart';
 import 'core/theme/app_theme.dart';
-import 'features/auth/login_screen.dart';
+import 'features/auth/services/auth_wrapper.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,7 +24,7 @@ class FitnessApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Fitness App',
       theme: AppTheme.lightTheme,
-      home: const LoginScreen(),
+      home: const AuthWrapper(),
     );
   }
 }

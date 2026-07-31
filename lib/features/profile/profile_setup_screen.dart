@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+
 import 'profile_model.dart';
 import 'profile_service.dart';
+import '../main/main_screen.dart';
 
 class ProfileSetupScreen extends StatefulWidget {
   const ProfileSetupScreen({super.key});
@@ -34,7 +36,9 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
 
     if (user == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("User not logged in")),
+        const SnackBar(
+          content: Text("User not logged in"),
+        ),
       );
       return;
     }
@@ -67,21 +71,28 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
         ),
       );
 
-      // TODO:
-      // Replace this with DashboardScreen later.
-      Navigator.pop(context);
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) => const MainScreen (),
+        ),
+      );
     } catch (e) {
+      if (!mounted) return;
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(e.toString()),
           backgroundColor: Colors.red,
         ),
       );
+    } finally {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
     }
-
-    setState(() {
-      isLoading = false;
-    });
   }
 
   Widget buildTextField({
@@ -97,7 +108,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
         keyboardType: keyboardType,
         validator: (value) {
           if (value == null || value.trim().isEmpty) {
-            return "Required";
+            return "Please enter $label";
           }
           return null;
         },
@@ -135,7 +146,6 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
             padding: const EdgeInsets.all(20),
             child: Column(
               children: [
-
                 const Icon(
                   Icons.account_circle,
                   size: 110,
@@ -270,6 +280,10 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                   height: 55,
                   child: ElevatedButton(
                     onPressed: isLoading ? null : saveProfile,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
+                      foregroundColor: Colors.white,
+                    ),
                     child: isLoading
                         ? const CircularProgressIndicator(
                             color: Colors.white,
