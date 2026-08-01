@@ -1,6 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../../utils/calorie_calculator.dart';
 
 import '../auth/login_screen.dart';
 import '../profile/profile_model.dart';
@@ -43,11 +44,27 @@ class _DashboardScreenState extends State<DashboardScreen> {
     }
   }
 
-  double calculateBMI() {
-    if (userProfile == null) return 0;
-    final h = userProfile!.height / 100;
-    return userProfile!.weight / (h * h);
-  }
+double calculateBMI() {
+  if (userProfile == null) return 0;
+
+  final heightInMeters = userProfile!.height / 100;
+
+  return userProfile!.weight /
+      (heightInMeters * heightInMeters);
+}
+
+  double calculateDailyCalories() {
+  if (userProfile == null) return 0;
+
+  return CalorieCalculator.calculateCalories(
+    age: userProfile!.age,
+    height: userProfile!.height,
+    weight: userProfile!.weight,
+    gender: userProfile!.gender,
+    goal: userProfile!.goal,
+    activityLevel: userProfile!.activityLevel,
+  );
+}
 
   String greeting() {
     final hour = DateTime.now().hour;
@@ -143,7 +160,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               crossAxisSpacing: 15,
               mainAxisSpacing: 15,
               children: [
-                DashboardCard(title:"Calories",value:"0 / 2200 kcal",icon:Icons.local_fire_department,color:Colors.orange),
+                DashboardCard(title:"Calories",value:"${calculateDailyCalories().toStringAsFixed(0)} kcal",icon:Icons.local_fire_department,color:Colors.orange),
                 DashboardCard(title:"Water",value:"0 / 3 L",icon:Icons.water_drop,color:Colors.blue),
                 DashboardCard(title:"Weight",value:"${userProfile?.weight.toStringAsFixed(1) ?? "0"} kg",icon:Icons.monitor_weight,color:Colors.green),
                 DashboardCard(title:"BMI",value:calculateBMI().toStringAsFixed(1),icon:Icons.favorite,color:Colors.red),
