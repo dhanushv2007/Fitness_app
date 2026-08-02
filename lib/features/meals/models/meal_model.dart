@@ -44,4 +44,5 @@ class MealModel {
       date: DateTime.parse(map['date']),
     );
   }
+  
 }

@@ -13,7 +13,7 @@ class MealsScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Today's Meals"),
+        title: const Text("Meals"),
       ),
 
       floatingActionButton: FloatingActionButton(
@@ -31,129 +31,179 @@ class MealsScreen extends StatelessWidget {
 
       body: StreamBuilder<List<MealModel>>(
         stream: mealService.getMeals(),
-
         builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
+
+          if (snapshot.connectionState ==
+              ConnectionState.waiting) {
             return const Center(
               child: CircularProgressIndicator(),
             );
           }
 
-          if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(
-              child: Text(
-                "No meals added today",
-                style: TextStyle(fontSize: 18),
-              ),
-            );
+          final meals = snapshot.data ?? [];
+
+          int calories = 0;
+          double protein = 0;
+          double carbs = 0;
+          double fats = 0;
+
+          for (var meal in meals) {
+            calories += meal.calories;
+            protein += meal.protein;
+            carbs += meal.carbs;
+            fats += meal.fats;
           }
-
-          final meals = snapshot.data!;
-
-          final totalCalories = meals.fold(
-            0,
-            (sum, meal) => sum + meal.calories,
-          );
 
           return Column(
             children: [
 
               Container(
-                margin: const EdgeInsets.all(16),
-                padding: const EdgeInsets.all(18),
+                margin: const EdgeInsets.all(15),
+                padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
                   color: Colors.green,
-                  borderRadius: BorderRadius.circular(18),
+                  borderRadius: BorderRadius.circular(20),
                 ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
+                child: Column(
                   children: [
 
                     const Text(
-                      "Today's Calories",
+                      "Today's Nutrition",
                       style: TextStyle(
                         color: Colors.white,
-                        fontSize: 18,
-                      ),
-                    ),
-
-                    Text(
-                      "$totalCalories kcal",
-                      style: const TextStyle(
-                        color: Colors.white,
+                        fontSize: 22,
                         fontWeight: FontWeight.bold,
-                        fontSize: 24,
                       ),
                     ),
 
+                    const SizedBox(height: 20),
+
+                    Row(
+                      mainAxisAlignment:
+                          MainAxisAlignment.spaceAround,
+                      children: [
+
+                        nutritionTile(
+                          calories.toString(),
+                          "Calories",
+                        ),
+
+                        nutritionTile(
+                          protein.toStringAsFixed(1),
+                          "Protein",
+                        ),
+
+                        nutritionTile(
+                          carbs.toStringAsFixed(1),
+                          "Carbs",
+                        ),
+
+                        nutritionTile(
+                          fats.toStringAsFixed(1),
+                          "Fat",
+                        ),
+
+                      ],
+                    ),
                   ],
                 ),
               ),
 
               Expanded(
-                child: ListView.builder(
-                  itemCount: meals.length,
-
-                  itemBuilder: (context, index) {
-                    final meal = meals[index];
-
-                    return Card(
-                      margin: const EdgeInsets.symmetric(
-                        horizontal: 15,
-                        vertical: 8,
-                      ),
-
-                      child: ListTile(
-
-                        leading: CircleAvatar(
-                          backgroundColor: Colors.green.shade100,
-                          child: const Icon(
-                            Icons.restaurant,
-                            color: Colors.green,
-                          ),
+                child: meals.isEmpty
+                    ? const Center(
+                        child: Text(
+                          "No meals added",
+                          style: TextStyle(fontSize: 18),
                         ),
+                      )
+                    : ListView.builder(
+                        itemCount: meals.length,
+                        itemBuilder: (context, index) {
 
-                        title: Text(meal.foodName),
+                          final meal = meals[index];
 
-                        subtitle: Text(
-                          "${meal.mealType}\n"
-                          "Protein: ${meal.protein}g | "
-                          "Carbs: ${meal.carbs}g | "
-                          "Fat: ${meal.fats}g",
-                        ),
-
-                        trailing: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-
-                            Text(
-                              "${meal.calories}",
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18,
-                              ),
+                          return Card(
+                            margin: const EdgeInsets.symmetric(
+                              horizontal: 15,
+                              vertical: 8,
                             ),
 
-                            const Text("kcal"),
-                          ],
-                        ),
+                            child: ListTile(
 
-                        isThreeLine: true,
+                              leading: CircleAvatar(
+                                backgroundColor:
+                                    Colors.green.shade100,
+                                child: const Icon(
+                                  Icons.restaurant,
+                                  color: Colors.green,
+                                ),
+                              ),
 
-                        onLongPress: () async {
+                              title: Text(meal.foodName),
 
-                          await mealService.deleteMeal(meal.id);
+                              subtitle: Text(
+                                meal.mealType,
+                              ),
 
+                              trailing: Column(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.center,
+
+                                children: [
+
+                                  Text(
+                                    "${meal.calories}",
+                                    style: const TextStyle(
+                                      fontWeight:
+                                          FontWeight.bold,
+                                    ),
+                                  ),
+
+                                  const Text("kcal"),
+                                ],
+                              ),
+
+                              onLongPress: () async {
+                                await mealService
+                                    .deleteMeal(meal.id);
+                              },
+                            ),
+                          );
                         },
                       ),
-                    );
-                  },
-                ),
               ),
             ],
           );
         },
       ),
+    );
+  }
+
+  Widget nutritionTile(
+    String value,
+    String label,
+  ) {
+    return Column(
+      children: [
+
+        Text(
+          value,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+
+        Text(
+          label,
+          style: const TextStyle(
+            color: Colors.white70,
+          ),
+        ),
+      ],
     );
   }
 }

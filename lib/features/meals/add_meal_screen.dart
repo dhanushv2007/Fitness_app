@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 
+import 'food_search_screen.dart';
 import 'models/meal_model.dart';
 import 'services/meal_service.dart';
 
@@ -14,16 +15,15 @@ class AddMealScreen extends StatefulWidget {
 class _AddMealScreenState extends State<AddMealScreen> {
   final _formKey = GlobalKey<FormState>();
 
-  final foodController = TextEditingController();
-  final caloriesController = TextEditingController();
-  final proteinController = TextEditingController();
-  final carbsController = TextEditingController();
-  final fatsController = TextEditingController();
+  final TextEditingController foodController = TextEditingController();
+  final TextEditingController caloriesController = TextEditingController();
+  final TextEditingController proteinController = TextEditingController();
+  final TextEditingController carbsController = TextEditingController();
+  final TextEditingController fatsController = TextEditingController();
 
   final MealService mealService = MealService();
 
   String mealType = "Breakfast";
-
   bool isLoading = false;
 
   Future<void> saveMeal() async {
@@ -33,26 +33,39 @@ class _AddMealScreenState extends State<AddMealScreen> {
       isLoading = true;
     });
 
-    final meal = MealModel(
-      id: const Uuid().v4(),
-      mealType: mealType,
-      foodName: foodController.text.trim(),
-      calories: int.parse(caloriesController.text),
-      protein: double.parse(proteinController.text),
-      carbs: double.parse(carbsController.text),
-      fats: double.parse(fatsController.text),
-      date: DateTime.now(),
-    );
+    try {
+      final meal = MealModel(
+        id: const Uuid().v4(),
+        mealType: mealType,
+        foodName: foodController.text.trim(),
+        calories: int.parse(caloriesController.text),
+        protein: double.parse(proteinController.text),
+        carbs: double.parse(carbsController.text),
+        fats: double.parse(fatsController.text),
+        date: DateTime.now(),
+      );
 
-    await mealService.addMeal(meal);
+      await mealService.addMeal(meal);
 
-    if (!mounted) return;
+      if (!mounted) return;
 
-    Navigator.pop(context);
+      Navigator.pop(context);
+    } catch (e) {
+      if (!mounted) return;
 
-    setState(() {
-      isLoading = false;
-    });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.toString()),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    }
   }
 
   Widget numberField(
@@ -63,10 +76,10 @@ class _AddMealScreenState extends State<AddMealScreen> {
       padding: const EdgeInsets.only(bottom: 18),
       child: TextFormField(
         controller: controller,
-        keyboardType: TextInputType.number,
+        keyboardType: const TextInputType.numberWithOptions(decimal: true),
         validator: (value) {
-          if (value == null || value.isEmpty) {
-            return "Required";
+          if (value == null || value.trim().isEmpty) {
+            return "Please enter $label";
           }
           return null;
         },
@@ -92,52 +105,40 @@ class _AddMealScreenState extends State<AddMealScreen> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
         title: const Text("Add Meal"),
       ),
-
       body: Padding(
         padding: const EdgeInsets.all(20),
-
         child: Form(
           key: _formKey,
-
           child: ListView(
             children: [
-
               DropdownButtonFormField<String>(
                 value: mealType,
-
                 decoration: const InputDecoration(
                   labelText: "Meal Type",
                   border: OutlineInputBorder(),
                 ),
-
                 items: const [
-
                   DropdownMenuItem(
                     value: "Breakfast",
                     child: Text("Breakfast"),
                   ),
-
                   DropdownMenuItem(
                     value: "Lunch",
                     child: Text("Lunch"),
                   ),
-
                   DropdownMenuItem(
                     value: "Dinner",
                     child: Text("Dinner"),
                   ),
-
                   DropdownMenuItem(
                     value: "Snacks",
                     child: Text("Snacks"),
                   ),
                 ],
-
                 onChanged: (value) {
                   setState(() {
                     mealType = value!;
@@ -147,16 +148,41 @@ class _AddMealScreenState extends State<AddMealScreen> {
 
               const SizedBox(height: 20),
 
+              ElevatedButton.icon(
+                icon: const Icon(Icons.search),
+                label: const Text("Search Food"),
+                onPressed: () async {
+                  final food = await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const FoodSearchScreen(),
+                    ),
+                  );
+
+                  if (food != null) {
+                    foodController.text = food.name;
+                    caloriesController.text =
+                        food.calories.toString();
+                    proteinController.text =
+                        food.protein.toString();
+                    carbsController.text =
+                        food.carbs.toString();
+                    fatsController.text =
+                        food.fats.toString();
+                  }
+                },
+              ),
+
+              const SizedBox(height: 20),
+
               TextFormField(
                 controller: foodController,
-
                 validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return "Enter food";
+                  if (value == null || value.trim().isEmpty) {
+                    return "Please enter food name";
                   }
                   return null;
                 },
-
                 decoration: InputDecoration(
                   labelText: "Food Name",
                   border: OutlineInputBorder(
@@ -190,17 +216,19 @@ class _AddMealScreenState extends State<AddMealScreen> {
               const SizedBox(height: 25),
 
               SizedBox(
+                width: double.infinity,
                 height: 55,
-
                 child: ElevatedButton(
                   onPressed: isLoading ? null : saveMeal,
-
                   child: isLoading
-                      ? const CircularProgressIndicator()
+                      ? const CircularProgressIndicator(
+                          color: Colors.white,
+                        )
                       : const Text(
                           "Save Meal",
                           style: TextStyle(
                             fontSize: 18,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
                 ),
