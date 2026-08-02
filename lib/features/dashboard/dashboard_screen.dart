@@ -1,6 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../water/water_screen.dart';
 import '../../utils/calorie_calculator.dart';
 import 'dashboard_service.dart';
 import '../../models/dashboard_stats.dart';
@@ -166,8 +167,30 @@ double calculateBMI() {
               crossAxisSpacing: 15,
               mainAxisSpacing: 15,
               children: [
-                DashboardCard(title:"Calories",value:"${calculateDailyCalories().toStringAsFixed(0)} kcal",icon:Icons.local_fire_department,color:Colors.orange),
-                DashboardCard(title:"Water",value:"0 / 3 L",icon:Icons.water_drop,color:Colors.blue),
+                DashboardCard(
+  title: "Calories",
+  value:
+      "${dashboardStats?.caloriesConsumed ?? 0} / ${calculateDailyCalories().toStringAsFixed(0)} kcal",
+  icon: Icons.local_fire_department,
+  color: Colors.orange,
+),
+                DashboardCard(
+  title: "Water",
+  value:
+      "${dashboardStats?.waterConsumed ?? 0} / ${dashboardStats?.waterGoal ?? 3} L",
+  icon: Icons.water_drop,
+  color: Colors.blue,
+  onTap: () {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const WaterScreen(),
+      ),
+    ).then((_) {
+      loadProfile();
+    });
+  },
+),
                 DashboardCard(title:"Weight",value:"${userProfile?.weight.toStringAsFixed(1) ?? "0"} kg",icon:Icons.monitor_weight,color:Colors.green),
                 DashboardCard(title:"BMI",value:calculateBMI().toStringAsFixed(1),icon:Icons.favorite,color:Colors.red),
                 DashboardCard(title:"Steps",value:"0",icon:Icons.directions_walk,color:Colors.deepPurple),
