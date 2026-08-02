@@ -20,17 +20,17 @@ class DashboardCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(18),
+      borderRadius: BorderRadius.circular(20),
       child: Container(
         padding: const EdgeInsets.all(18),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.08),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
+              blurRadius: 12,
+              offset: const Offset(0, 5),
             ),
           ],
         ),
@@ -40,22 +40,36 @@ class DashboardCard extends StatelessWidget {
             CircleAvatar(
               radius: 22,
               backgroundColor: color.withOpacity(0.15),
-              child: Icon(icon, color: color),
+              child: Icon(
+                icon,
+                color: color,
+                size: 24,
+              ),
             ),
+
             const Spacer(),
+
             Text(
               title,
               style: const TextStyle(
-                color: Colors.grey,
                 fontSize: 14,
+                color: Colors.grey,
+                fontWeight: FontWeight.w500,
               ),
             ),
-            const SizedBox(height: 5),
-            Text(
-              value,
-              style: const TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
+
+            const SizedBox(height: 6),
+
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerLeft,
+              child: Text(
+                value,
+                maxLines: 1,
+                style: const TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ],

@@ -2,7 +2,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../utils/calorie_calculator.dart';
-
+import 'dashboard_service.dart';
+import '../../models/dashboard_stats.dart';
 import '../auth/login_screen.dart';
 import '../profile/profile_model.dart';
 import '../profile/profile_service.dart';
@@ -17,6 +18,9 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
   final ProfileService _profileService = ProfileService();
+  final DashboardService _dashboardService = DashboardService();
+
+DashboardStats? dashboardStats;
 
   UserProfile? userProfile;
   bool isLoading = true;
@@ -30,9 +34,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Future<void> loadProfile() async {
     try {
       final profile = await _profileService.getProfile();
+      final stats = await _dashboardService.loadDashboard();
       if (!mounted) return;
       setState(() {
         userProfile = profile;
+        dashboardStats = stats;
         isLoading = false;
       });
     } catch (e) {
