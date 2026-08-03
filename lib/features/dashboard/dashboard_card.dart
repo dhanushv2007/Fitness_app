@@ -20,30 +20,34 @@ class DashboardCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(20),
+      borderRadius: BorderRadius.circular(25),
       child: Container(
         padding: const EdgeInsets.all(18),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(25),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.08),
-              blurRadius: 12,
-              offset: const Offset(0, 5),
+              color: color.withOpacity(.15),
+              blurRadius: 18,
+              offset: const Offset(0, 8),
             ),
           ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            CircleAvatar(
-              radius: 22,
-              backgroundColor: color.withOpacity(0.15),
+
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: color.withOpacity(.12),
+                borderRadius: BorderRadius.circular(15),
+              ),
               child: Icon(
                 icon,
                 color: color,
-                size: 24,
+                size: 28,
               ),
             ),
 
@@ -51,25 +55,19 @@ class DashboardCard extends StatelessWidget {
 
             Text(
               title,
-              style: const TextStyle(
-                fontSize: 14,
-                color: Colors.grey,
-                fontWeight: FontWeight.w500,
+              style: TextStyle(
+                color: Colors.grey.shade600,
+                fontSize: 15,
               ),
             ),
 
             const SizedBox(height: 6),
 
-            FittedBox(
-              fit: BoxFit.scaleDown,
-              alignment: Alignment.centerLeft,
-              child: Text(
-                value,
-                maxLines: 1,
-                style: const TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                ),
+            Text(
+              value,
+              style: const TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
               ),
             ),
           ],

@@ -116,81 +116,224 @@ double calculateBMI() {
     return Scaffold(
       backgroundColor: const Color(0xffF5F7FA),
       appBar: AppBar(
-        title: const Text("Fitness Tracker"),
-        actions: [
-          IconButton(
-            onPressed: logout,
-            icon: const Icon(Icons.logout),
-          )
-        ],
-      ),
+  elevation: 0,
+  backgroundColor: Colors.transparent,
+  surfaceTintColor: Colors.transparent,
+  title: const Text(
+    "Dashboard",
+    style: TextStyle(
+      fontSize: 28,
+      fontWeight: FontWeight.bold,
+    ),
+  ),
+  actions: [
+    IconButton(
+      icon: const Icon(Icons.notifications_none_rounded),
+      onPressed: () {
+        // We'll add notifications later
+      },
+    ),
+    IconButton(
+      icon: const Icon(Icons.logout),
+      onPressed: logout,
+    ),
+  ],
+),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(22),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(24),
-                gradient: const LinearGradient(
-                  colors: [Color(0xff43A047), Color(0xff2E7D32)],
-                ),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text("${greeting()} 👋",
-                      style: const TextStyle(color: Colors.white70)),
-                  const SizedBox(height: 6),
-                  Text(
-                    userProfile?.name ?? "User",
-                    style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 30),
-                  ),
-                  const SizedBox(height: 8),
-                  const Text(
-                    "Let's achieve your fitness goals today 💪",
-                    style: TextStyle(color: Colors.white70),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 24),
-            GridView.count(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              crossAxisCount: 2,
-              crossAxisSpacing: 15,
-              mainAxisSpacing: 15,
-              children: [
-                DashboardCard(
-  title: "Calories",
-  value:
-      "${dashboardStats?.caloriesConsumed ?? 0} / ${calculateDailyCalories().toStringAsFixed(0)} kcal",
-  icon: Icons.local_fire_department,
-  color: Colors.orange,
-),
-                DashboardCard(
-  title: "Water",
-  value:
-      "${dashboardStats?.waterConsumed ?? 0} / ${dashboardStats?.waterGoal ?? 3} L",
-  icon: Icons.water_drop,
-  color: Colors.blue,
-  onTap: () {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => const WaterScreen(),
+  width: double.infinity,
+  padding: const EdgeInsets.all(25),
+  decoration: BoxDecoration(
+    borderRadius: BorderRadius.circular(30),
+    gradient: const LinearGradient(
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+      colors: [
+        Color(0xff22C55E),
+        Color(0xff15803D),
+      ],
+    ),
+    boxShadow: [
+      BoxShadow(
+        color: Colors.green.withOpacity(0.35),
+        blurRadius: 20,
+        offset: const Offset(0, 8),
       ),
-    ).then((_) {
-      loadProfile();
-    });
+    ],
+  ),
+  child: Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+
+      Row(
+        children: [
+          const CircleAvatar(
+            radius: 28,
+            backgroundColor: Colors.white,
+            child: Icon(
+              Icons.person,
+              color: Colors.green,
+              size: 30,
+            ),
+          ),
+
+          const SizedBox(width: 15),
+
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+
+                Text(
+                  greeting(),
+                  style: const TextStyle(
+                    color: Colors.white70,
+                    fontSize: 16,
+                  ),
+                ),
+
+                Text(
+                  userProfile?.name ?? "User",
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 28,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+
+      const SizedBox(height: 30),
+
+      const Text(
+        "Today's Calories",
+        style: TextStyle(
+          color: Colors.white70,
+          fontSize: 15,
+        ),
+      ),
+
+      const SizedBox(height: 10),
+
+      ClipRRect(
+        borderRadius: BorderRadius.circular(30),
+        child: LinearProgressIndicator(
+          value: (dashboardStats?.caloriesConsumed ?? 0) /
+              calculateDailyCalories(),
+          minHeight: 12,
+          backgroundColor: Colors.white24,
+          valueColor:
+              const AlwaysStoppedAnimation(Colors.white),
+        ),
+      ),
+
+      const SizedBox(height: 15),
+
+      Text(
+        "${dashboardStats?.caloriesConsumed.toStringAsFixed(0) ?? 0} / ${calculateDailyCalories().toStringAsFixed(0)} kcal",
+        style: const TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+          fontSize: 24,
+        ),
+      ),
+
+      const SizedBox(height: 8),
+
+      const Text(
+        "Stay consistent. Every workout counts! 💪",
+        style: TextStyle(
+          color: Colors.white70,
+        ),
+      ),
+    ],
+  ),
+),
+            const SizedBox(height: 24),
+            GridView.builder(
+  shrinkWrap: true,
+  physics: const NeverScrollableScrollPhysics(),
+
+  gridDelegate:
+      const SliverGridDelegateWithFixedCrossAxisCount(
+    crossAxisCount: 2,
+    crossAxisSpacing: 18,
+    mainAxisSpacing: 18,
+    childAspectRatio: .95,
+  ),
+
+  itemCount: 6,
+
+  itemBuilder: (context, index) {
+
+    final cards = [
+
+      DashboardCard(
+        title: "Calories",
+        value:
+            "${dashboardStats?.caloriesConsumed.toStringAsFixed(0) ?? 0}",
+        icon: Icons.local_fire_department,
+        color: Colors.orange,
+      ),
+
+      DashboardCard(
+        title: "Water",
+        value:
+            "${dashboardStats?.waterConsumed.toStringAsFixed(1) ?? 0} L",
+        icon: Icons.water_drop,
+        color: Colors.blue,
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => const WaterScreen(),
+            ),
+          ).then((_) => loadProfile());
+        },
+      ),
+
+      DashboardCard(
+        title: "Weight",
+        value:
+            "${userProfile?.weight.toStringAsFixed(1) ?? "0"} kg",
+        icon: Icons.monitor_weight,
+        color: Colors.green,
+      ),
+
+      DashboardCard(
+        title: "BMI",
+        value: calculateBMI().toStringAsFixed(1),
+        icon: Icons.favorite,
+        color: Colors.red,
+      ),
+
+      DashboardCard(
+        title: "Steps",
+        value: "0",
+        icon: Icons.directions_walk,
+        color: Colors.deepPurple,
+      ),
+
+      DashboardCard(
+        title: "Streak",
+        value: "1 Day",
+        icon: Icons.emoji_events,
+        color: Colors.amber,
+      ),
+
+    ];
+
+    return cards[index];
   },
 ),
+
                 DashboardCard(title:"Weight",value:"${userProfile?.weight.toStringAsFixed(1) ?? "0"} kg",icon:Icons.monitor_weight,color:Colors.green),
                 DashboardCard(title:"BMI",value:calculateBMI().toStringAsFixed(1),icon:Icons.favorite,color:Colors.red),
                 DashboardCard(title:"Steps",value:"0",icon:Icons.directions_walk,color:Colors.deepPurple),
