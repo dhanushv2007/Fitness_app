@@ -1,6 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:percent_indicator/circular_percent_indicator.dart';
 import '../water/water_screen.dart';
 import '../../utils/calorie_calculator.dart';
 import 'dashboard_service.dart';
@@ -9,6 +10,7 @@ import '../auth/login_screen.dart';
 import '../profile/profile_model.dart';
 import '../profile/profile_service.dart';
 import 'dashboard_card.dart';
+import '../meals/add_meal_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -90,20 +92,167 @@ double calculateBMI() {
     );
   }
 
-  Widget mealCard(IconData icon, String title, Color color) {
-    return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: ListTile(
-        leading: CircleAvatar(
-          backgroundColor: color.withOpacity(.15),
-          child: Icon(icon, color: color),
+  Widget mealCard(
+  IconData icon,
+  String title,
+  Color color,
+) {
+  return Container(
+    margin: const EdgeInsets.only(bottom: 15),
+    padding: const EdgeInsets.all(18),
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(20),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withOpacity(.05),
+          blurRadius: 12,
+          offset: const Offset(0, 5),
         ),
-        title: Text(title),
-        subtitle: const Text("No meal added"),
-        trailing: const Icon(Icons.add_circle_outline),
+      ],
+    ),
+    child: Row(
+      children: [
+
+        CircleAvatar(
+          radius: 25,
+          backgroundColor: color.withOpacity(.15),
+          child: Icon(
+            icon,
+            color: color,
+          ),
+        ),
+
+        const SizedBox(width: 18),
+
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+
+              Text(
+                title,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                ),
+              ),
+
+              const SizedBox(height: 5),
+
+              const Text(
+                "No meal added today",
+                style: TextStyle(
+                  color: Colors.grey,
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        Container(
+          decoration: BoxDecoration(
+            color: color.withOpacity(.12),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: IconButton(
+            icon: Icon(
+              Icons.add,
+              color: color,
+            ),
+            onPressed: () async {
+  await Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (_) => AddMealScreen(
+        initialMealType: title,
       ),
-    );
-  }
+    ),
+  );
+
+  loadProfile();
+},
+          ),
+        ),
+      ],
+    ),
+  );
+}
+  Widget _progressItem(
+  String title,
+  String value,
+  IconData icon,
+  Color color,
+) {
+  return Column(
+    children: [
+
+      CircleAvatar(
+        radius: 26,
+        backgroundColor: color.withOpacity(.15),
+        child: Icon(
+          icon,
+          color: color,
+        ),
+      ),
+
+      const SizedBox(height: 10),
+
+      Text(
+        value,
+        style: const TextStyle(
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+
+      Text(
+        title,
+        style: const TextStyle(
+          color: Colors.grey,
+        ),
+      ),
+    ],
+  );
+}
+Widget _quickAction(
+  BuildContext context, {
+  required IconData icon,
+  required String title,
+  required Color color,
+  required VoidCallback onTap,
+}) {
+  return InkWell(
+    onTap: onTap,
+    borderRadius: BorderRadius.circular(18),
+    child: Container(
+      padding: const EdgeInsets.symmetric(vertical: 18),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.12),
+        borderRadius: BorderRadius.circular(18),
+      ),
+      child: Column(
+        children: [
+          CircleAvatar(
+            radius: 24,
+            backgroundColor: color,
+            child: Icon(
+              icon,
+              color: Colors.white,
+            ),
+          ),
+          const SizedBox(height: 10),
+          Text(
+            title,
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}
 
   @override
   Widget build(BuildContext context) {
@@ -222,17 +371,69 @@ double calculateBMI() {
 
       const SizedBox(height: 10),
 
-      ClipRRect(
-        borderRadius: BorderRadius.circular(30),
-        child: LinearProgressIndicator(
-          value: (dashboardStats?.caloriesConsumed ?? 0) /
-              calculateDailyCalories(),
-          minHeight: 12,
-          backgroundColor: Colors.white24,
-          valueColor:
-              const AlwaysStoppedAnimation(Colors.white),
+      Row(
+  children: [
+
+    CircularPercentIndicator(
+      radius: 45,
+      lineWidth: 8,
+      animation: true,
+      percent: ((dashboardStats?.caloriesConsumed ?? 0) /
+              calculateDailyCalories())
+          .clamp(0.0, 1.0),
+      center: Text(
+        "${(((dashboardStats?.caloriesConsumed ?? 0) /
+                calculateDailyCalories()) *
+            100).toStringAsFixed(0)}%",
+        style: const TextStyle(
+          fontWeight: FontWeight.bold,
         ),
       ),
+      progressColor: Colors.white,
+      backgroundColor: Colors.white24,
+      circularStrokeCap: CircularStrokeCap.round,
+    ),
+
+    const SizedBox(width: 20),
+
+    Expanded(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+
+          const Text(
+            "Today's Goal",
+            style: TextStyle(
+              color: Colors.white70,
+              fontSize: 16,
+            ),
+          ),
+
+          const SizedBox(height: 6),
+
+          Text(
+            "${dashboardStats?.caloriesConsumed.toStringAsFixed(0) ?? 0} / ${calculateDailyCalories().toStringAsFixed(0)} kcal",
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+
+          const SizedBox(height: 6),
+
+          const Text(
+            "Keep going! 💪",
+            style: TextStyle(
+              color: Colors.white70,
+            ),
+          ),
+        ],
+      ),
+    ),
+
+  ],
+),
 
       const SizedBox(height: 15),
 
@@ -333,22 +534,140 @@ double calculateBMI() {
     return cards[index];
   },
 ),
+const SizedBox(height: 30),
 
-                DashboardCard(title:"Weight",value:"${userProfile?.weight.toStringAsFixed(1) ?? "0"} kg",icon:Icons.monitor_weight,color:Colors.green),
-                DashboardCard(title:"BMI",value:calculateBMI().toStringAsFixed(1),icon:Icons.favorite,color:Colors.red),
-                DashboardCard(title:"Steps",value:"0",icon:Icons.directions_walk,color:Colors.deepPurple),
-                DashboardCard(title:"Streak",value:"1 Day",icon:Icons.emoji_events,color:Colors.amber),
-              ],
-            ),
+const Text(
+  "Weekly Progress",
+  style: TextStyle(
+    fontSize: 22,
+    fontWeight: FontWeight.bold,
+  ),
+),
+
+const SizedBox(height: 15),
+
+Container(
+  width: double.infinity,
+  padding: const EdgeInsets.all(20),
+  decoration: BoxDecoration(
+    color: Colors.white,
+    borderRadius: BorderRadius.circular(25),
+    boxShadow: [
+      BoxShadow(
+        color: Colors.black.withOpacity(.05),
+        blurRadius: 15,
+        offset: const Offset(0, 5),
+      ),
+    ],
+  ),
+  child: Column(
+    children: [
+
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+
+          _progressItem(
+            "Calories",
+            "${dashboardStats?.caloriesConsumed.toStringAsFixed(0) ?? "0"}",
+            Icons.local_fire_department,
+            Colors.orange,
+          ),
+
+          _progressItem(
+            "Water",
+            "${dashboardStats?.waterConsumed.toStringAsFixed(1) ?? "0"}L",
+            Icons.water_drop,
+            Colors.blue,
+          ),
+
+          _progressItem(
+            "Workout",
+            "1",
+            Icons.fitness_center,
+            Colors.green,
+          ),
+
+        ],
+      ),
+    ],
+  ),
+),
+const SizedBox(height: 30),
+
+const SizedBox(height: 30),
+
+
+
+const SizedBox(height: 15),
+
+Row(
+  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  children: [
+    const Text(
+      "Today's Meals",
+      style: TextStyle(
+        fontSize: 22,
+        fontWeight: FontWeight.bold,
+      ),
+    ),
+    TextButton(
+      onPressed: () {},
+      child: const Text("View All"),
+    ),
+  ],
+),
+
+const SizedBox(height: 15),
+
+mealCard(
+  Icons.free_breakfast,
+  "Breakfast",
+  Colors.orange,
+),
+
+mealCard(
+  Icons.lunch_dining,
+  "Lunch",
+  Colors.green,
+),
+
+mealCard(
+  Icons.dinner_dining,
+  "Dinner",
+  Colors.blue,
+),
+
+mealCard(
+  Icons.cookie,
+  "Snacks",
+  Colors.deepPurple,
+),
+
+const SizedBox(height: 24),
+
+
+
+            
+
+
             const SizedBox(height:24),
-            const Text("Today's Meals",style:TextStyle(fontSize:22,fontWeight:FontWeight.bold)),
-            const SizedBox(height:12),
-            mealCard(Icons.free_breakfast,"Breakfast",Colors.orange),
-            mealCard(Icons.lunch_dining,"Lunch",Colors.green),
-            mealCard(Icons.dinner_dining,"Dinner",Colors.blue),
-            mealCard(Icons.cookie,"Snacks",Colors.deepPurple),
-            const SizedBox(height:24),
-            const Text("Today's Workout",style:TextStyle(fontSize:22,fontWeight:FontWeight.bold)),
+            Row(
+  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  children: [
+    const Text(
+      "Today's Workout",
+      style: TextStyle(
+        fontSize: 22,
+        fontWeight: FontWeight.bold,
+      ),
+    ),
+    TextButton(
+      onPressed: () {},
+      child: const Text("View All"),
+    ),
+  ],
+),
             const SizedBox(height:12),
             Card(
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),

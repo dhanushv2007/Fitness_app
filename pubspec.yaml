@@ -35,3 +35,6 @@ flutter_launcher_icons:
   android: true
   ios: true
   image_path: "assets/icon/app_icon.png"
+  
+  dependencies:
+  percent_indicator: ^4.2.3

@@ -6,7 +6,12 @@ import 'models/meal_model.dart';
 import 'services/meal_service.dart';
 
 class AddMealScreen extends StatefulWidget {
-  const AddMealScreen({super.key});
+  final String? initialMealType;
+
+  const AddMealScreen({
+    super.key,
+    this.initialMealType,
+  });
 
   @override
   State<AddMealScreen> createState() => _AddMealScreenState();
@@ -24,7 +29,16 @@ class _AddMealScreenState extends State<AddMealScreen> {
   final MealService mealService = MealService();
 
   String mealType = "Breakfast";
-  bool isLoading = false;
+bool isLoading = false;
+
+@override
+void initState() {
+  super.initState();
+
+  if (widget.initialMealType != null) {
+    mealType = widget.initialMealType!;
+  }
+}
 
   Future<void> saveMeal() async {
     if (!_formKey.currentState!.validate()) return;
