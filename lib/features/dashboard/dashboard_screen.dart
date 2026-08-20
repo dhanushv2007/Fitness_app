@@ -11,6 +11,8 @@ import '../profile/profile_model.dart';
 import '../profile/profile_service.dart';
 import 'dashboard_card.dart';
 import '../meals/add_meal_screen.dart';
+import '../meals/models/meal_model.dart';
+import '../meals/services/meal_service.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -22,17 +24,22 @@ class DashboardScreen extends StatefulWidget {
 class _DashboardScreenState extends State<DashboardScreen> {
   final ProfileService _profileService = ProfileService();
   final DashboardService _dashboardService = DashboardService();
+  final MealService _mealService = MealService();
 
 DashboardStats? dashboardStats;
 
-  UserProfile? userProfile;
+List<MealModel> todaysMeals = [];
+
+UserProfile? userProfile;
   bool isLoading = true;
 
-  @override
-  void initState() {
-    super.initState();
-    loadProfile();
-  }
+ @override
+void initState() {
+  super.initState();
+
+  loadProfile();
+  loadTodaysMeals();
+}
 
   Future<void> loadProfile() async {
     try {
@@ -52,6 +59,23 @@ DashboardStats? dashboardStats;
       );
     }
   }
+Future<void> loadTodaysMeals() async {
+  final meals = await _mealService.getMeals().first;
+
+  final today = DateTime.now();
+
+  final filteredMeals = meals.where((meal) {
+    return meal.date.year == today.year &&
+        meal.date.month == today.month &&
+        meal.date.day == today.day;
+  }).toList();
+
+  if (!mounted) return;
+
+  setState(() {
+    todaysMeals = filteredMeals;
+  });
+}
 
 double calculateBMI() {
   if (userProfile == null) return 0;
@@ -97,6 +121,15 @@ double calculateBMI() {
   String title,
   Color color,
 ) {
+  final mealsForType = todaysMeals
+      .where((meal) => meal.mealType == title)
+      .toList();
+
+  final totalCalories = mealsForType.fold<int>(
+    0,
+    (sum, meal) => sum + meal.calories,
+  );
+
   return Container(
     margin: const EdgeInsets.only(bottom: 15),
     padding: const EdgeInsets.all(18),
@@ -113,7 +146,6 @@ double calculateBMI() {
     ),
     child: Row(
       children: [
-
         CircleAvatar(
           radius: 25,
           backgroundColor: color.withOpacity(.15),
@@ -129,7 +161,6 @@ double calculateBMI() {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-
               Text(
                 title,
                 style: const TextStyle(
@@ -140,12 +171,35 @@ double calculateBMI() {
 
               const SizedBox(height: 5),
 
-              const Text(
-                "No meal added today",
-                style: TextStyle(
-                  color: Colors.grey,
+              if (mealsForType.isEmpty)
+                const Text(
+                  "No meal added today",
+                  style: TextStyle(
+                    color: Colors.grey,
+                  ),
+                )
+              else ...[
+                Text(
+                  mealsForType
+                      .map((meal) => meal.foodName)
+                      .join(", "),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: Colors.black87,
+                  ),
                 ),
-              ),
+
+                const SizedBox(height: 4),
+
+                Text(
+                  "$totalCalories kcal",
+                  style: TextStyle(
+                    color: color,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
             ],
           ),
         ),
@@ -161,23 +215,25 @@ double calculateBMI() {
               color: color,
             ),
             onPressed: () async {
-  await Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (_) => AddMealScreen(
-        initialMealType: title,
-      ),
-    ),
-  );
+              await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => AddMealScreen(
+                    initialMealType: title,
+                  ),
+                ),
+              );
 
-  loadProfile();
-},
+              await loadProfile();
+              await loadTodaysMeals();
+            },
           ),
         ),
       ],
     ),
   );
 }
+
   Widget _progressItem(
   String title,
   String value,
@@ -595,7 +651,6 @@ Container(
 ),
 const SizedBox(height: 30),
 
-const SizedBox(height: 30),
 
 
 
