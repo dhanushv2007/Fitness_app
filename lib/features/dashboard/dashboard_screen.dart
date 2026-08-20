@@ -15,7 +15,12 @@ import '../meals/models/meal_model.dart';
 import '../meals/services/meal_service.dart';
 
 class DashboardScreen extends StatefulWidget {
-  const DashboardScreen({super.key});
+  final VoidCallback? onRefresh;
+
+  const DashboardScreen({
+    super.key,
+    this.onRefresh,
+  });
 
   @override
   State<DashboardScreen> createState() => _DashboardScreenState();
@@ -224,8 +229,19 @@ double calculateBMI() {
                 ),
               );
 
-              await loadProfile();
-              await loadTodaysMeals();
+  Future<void> refreshDashboard() async {
+  await loadProfile();
+  await loadTodaysMeals();
+
+  @override
+void didUpdateWidget(covariant DashboardScreen oldWidget) {
+  super.didUpdateWidget(oldWidget);
+
+  if (widget.onRefresh != oldWidget.onRefresh) {
+    widget.onRefresh?.call();
+  }
+}
+}
             },
           ),
         ),
@@ -468,13 +484,13 @@ Widget _quickAction(
           const SizedBox(height: 6),
 
           Text(
-            "${dashboardStats?.caloriesConsumed.toStringAsFixed(0) ?? 0} / ${calculateDailyCalories().toStringAsFixed(0)} kcal",
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
+  "${((dashboardStats?.caloriesConsumed ?? 0) / calculateDailyCalories() * 100).clamp(0, 100).toStringAsFixed(0)}% of today's goal completed",
+  style: const TextStyle(
+    color: Colors.white,
+    fontSize: 18,
+    fontWeight: FontWeight.w600,
+  ),
+),
 
           const SizedBox(height: 6),
 
@@ -493,14 +509,7 @@ Widget _quickAction(
 
       const SizedBox(height: 15),
 
-      Text(
-        "${dashboardStats?.caloriesConsumed.toStringAsFixed(0) ?? 0} / ${calculateDailyCalories().toStringAsFixed(0)} kcal",
-        style: const TextStyle(
-          color: Colors.white,
-          fontWeight: FontWeight.bold,
-          fontSize: 24,
-        ),
-      ),
+      
 
       const SizedBox(height: 8),
 

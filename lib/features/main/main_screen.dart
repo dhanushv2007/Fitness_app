@@ -14,29 +14,32 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-
   int currentIndex = 0;
 
-  final List<Widget> screens = const [
-    DashboardScreen(),
-    MealsScreen(),
-    WorkoutScreen(),
-    ProgressScreen(),
-    ProfileScreen(),
-  ];
+  late final List<Widget> screens;
+
+  @override
+  void initState() {
+    super.initState();
+
+    screens = [
+      DashboardScreen(),
+      const MealsScreen(),
+      const WorkoutScreen(),
+      const ProgressScreen(),
+      const ProfileScreen(),
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
-
       body: IndexedStack(
         index: currentIndex,
         children: screens,
       ),
 
       bottomNavigationBar: NavigationBar(
-
         selectedIndex: currentIndex,
 
         onDestinationSelected: (index) {
@@ -46,7 +49,6 @@ class _MainScreenState extends State<MainScreen> {
         },
 
         destinations: const [
-
           NavigationDestination(
             icon: Icon(Icons.home_outlined),
             selectedIcon: Icon(Icons.home),
@@ -76,7 +78,6 @@ class _MainScreenState extends State<MainScreen> {
             selectedIcon: Icon(Icons.person),
             label: "Profile",
           ),
-
         ],
       ),
     );
