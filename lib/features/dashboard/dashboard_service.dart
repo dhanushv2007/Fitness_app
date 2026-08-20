@@ -14,15 +14,35 @@ class DashboardService {
     // Load Meals
     // ==========================
 
-    final mealsSnapshot = await firestore
-        .collection('users')
-        .doc(uid)
-        .collection('meals')
-        .get();
+    final now = DateTime.now();
+
+final startOfDay = DateTime(
+  now.year,
+  now.month,
+  now.day,
+);
+
+final endOfDay = startOfDay.add(
+  const Duration(days: 1),
+);
+
+final meals = await firestore
+    .collection('users')
+    .doc(uid)
+    .collection('meals')
+    .where(
+      'date',
+      isGreaterThanOrEqualTo: startOfDay.toIso8601String(),
+    )
+    .where(
+      'date',
+      isLessThan: endOfDay.toIso8601String(),
+    )
+    .get();
 
     double caloriesConsumed = 0;
 
-    for (var doc in mealsSnapshot.docs) {
+    for (var doc in meals.docs) {
       final data = doc.data();
 
       caloriesConsumed +=
