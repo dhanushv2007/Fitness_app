@@ -15,6 +15,9 @@ class _ProgressScreenState extends State<ProgressScreen> {
 
   ProgressModel? progress;
   bool isLoading = true;
+  List<int> weeklyWorkoutCounts = [];
+  int weeklyCaloriesBurned = 0;
+  int weeklyWorkoutMinutes = 0;
 
   @override
   void initState() {
@@ -23,15 +26,22 @@ class _ProgressScreenState extends State<ProgressScreen> {
   }
 
   Future<void> loadProgress() async {
-    final data = await progressService.loadProgress();
+  final data = await progressService.loadProgress();
+  final weeklyCounts =
+      await progressService.loadWeeklyWorkoutCounts();
+  final weeklyCalories =
+    await progressService.loadWeeklyCaloriesBurned();
+  final weeklyMinutes =
+    await progressService.loadWeeklyWorkoutMinutes();
 
-    if (!mounted) return;
+  if (!mounted) return;
 
-    setState(() {
-      progress = data;
-      isLoading = false;
-    });
-  }
+  setState(() {
+    progress = data;
+    weeklyWorkoutCounts = weeklyCounts;
+    isLoading = false;
+  });
+}
 
   Widget statCard(
     String title,
@@ -81,6 +91,102 @@ class _ProgressScreenState extends State<ProgressScreen> {
       ),
     );
   }
+  Widget weeklyWorkoutChart() {
+  const days = [
+    "Mon",
+    "Tue",
+    "Wed",
+    "Thu",
+    "Fri",
+    "Sat",
+    "Sun",
+  ];
+
+  final maxValue = weeklyWorkoutCounts.isEmpty
+      ? 1
+      : weeklyWorkoutCounts.reduce(
+            (a, b) => a > b ? a : b,
+          );
+
+  return Card(
+    elevation: 4,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(18),
+    ),
+    child: Padding(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            "Weekly Workouts",
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+
+          const SizedBox(height: 25),
+
+          SizedBox(
+            height: 180,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: List.generate(
+                7,
+                (index) {
+                  final value =
+                      weeklyWorkoutCounts.length > index
+                          ? weeklyWorkoutCounts[index]
+                          : 0;
+
+                  final height = value == 0
+                      ? 8.0
+                      : (value / maxValue) * 120;
+
+                  return Column(
+                    mainAxisAlignment:
+                        MainAxisAlignment.end,
+                    children: [
+                      Text(
+                        "$value",
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+
+                      const SizedBox(height: 5),
+
+                      Container(
+                        width: 25,
+                        height: height,
+                        decoration: BoxDecoration(
+                          color: Colors.deepPurple,
+                          borderRadius:
+                              BorderRadius.circular(8),
+                        ),
+                      ),
+
+                      const SizedBox(height: 8),
+
+                      Text(
+                        days[index],
+                        style: const TextStyle(
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}
 
   @override
   Widget build(BuildContext context) {
@@ -144,6 +250,24 @@ class _ProgressScreenState extends State<ProgressScreen> {
               Icons.timer,
               Colors.teal,
             ),
+            const SizedBox(height: 20),
+
+statCard(
+  "Weekly Calories Burned",
+  "$weeklyCaloriesBurned kcal",
+  Icons.local_fire_department,
+  Colors.orange,
+),
+const SizedBox(height: 20),
+
+statCard(
+  "Weekly Workout Time",
+  "$weeklyWorkoutMinutes min",
+  Icons.timer,
+  Colors.teal,
+),
+
+weeklyWorkoutChart(),
 
           ],
         ),

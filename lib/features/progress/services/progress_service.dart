@@ -99,4 +99,151 @@ class ProgressService {
       workoutMinutes: minutes,
     );
   }
+  Future<List<int>> loadWeeklyWorkoutCounts() async {
+  final uid = auth.currentUser!.uid;
+
+  final workouts = await firestore
+      .collection('users')
+      .doc(uid)
+      .collection('workouts')
+      .get();
+
+  final now = DateTime.now();
+
+  // Monday = 1, Sunday = 7
+  final monday = DateTime(
+    now.year,
+    now.month,
+    now.day,
+  ).subtract(
+    Duration(days: now.weekday - 1),
+  );
+
+  final counts = List<int>.filled(7, 0);
+
+  for (final doc in workouts.docs) {
+    final data = doc.data();
+
+    final dateString = data['date'];
+
+    if (dateString is! String) continue;
+
+    final date = DateTime.tryParse(dateString);
+
+    if (date == null) continue;
+
+    final workoutDate = DateTime(
+      date.year,
+      date.month,
+      date.day,
+    );
+
+    final difference =
+        workoutDate.difference(monday).inDays;
+
+    if (difference >= 0 && difference < 7) {
+      counts[difference]++;
+    }
+  }
+
+  return counts;
+}
+Future<int> loadWeeklyCaloriesBurned() async {
+  final uid = auth.currentUser!.uid;
+
+  final workouts = await firestore
+      .collection('users')
+      .doc(uid)
+      .collection('workouts')
+      .get();
+
+  final now = DateTime.now();
+
+  final monday = DateTime(
+    now.year,
+    now.month,
+    now.day,
+  ).subtract(
+    Duration(days: now.weekday - 1),
+  );
+
+  int totalCalories = 0;
+
+  for (final doc in workouts.docs) {
+    final data = doc.data();
+
+    final dateString = data['date'];
+
+    if (dateString is! String) continue;
+
+    final date = DateTime.tryParse(dateString);
+
+    if (date == null) continue;
+
+    final workoutDate = DateTime(
+      date.year,
+      date.month,
+      date.day,
+    );
+
+    final difference =
+        workoutDate.difference(monday).inDays;
+
+    if (difference >= 0 && difference < 7) {
+      totalCalories +=
+          (data['caloriesBurned'] as num?)?.toInt() ?? 0;
+    }
+  }
+
+  return totalCalories;
+}
+Future<int> loadWeeklyWorkoutMinutes() async {
+  final uid = auth.currentUser!.uid;
+
+  final workouts = await firestore
+      .collection('users')
+      .doc(uid)
+      .collection('workouts')
+      .get();
+
+  final now = DateTime.now();
+
+  final monday = DateTime(
+    now.year,
+    now.month,
+    now.day,
+  ).subtract(
+    Duration(days: now.weekday - 1),
+  );
+
+  int totalMinutes = 0;
+
+  for (final doc in workouts.docs) {
+    final data = doc.data();
+
+    final dateString = data['date'];
+
+    if (dateString is! String) continue;
+
+    final date = DateTime.tryParse(dateString);
+
+    if (date == null) continue;
+
+    final workoutDate = DateTime(
+      date.year,
+      date.month,
+      date.day,
+    );
+
+    final difference =
+        workoutDate.difference(monday).inDays;
+
+    if (difference >= 0 && difference < 7) {
+      totalMinutes +=
+          (data['duration'] as num?)?.toInt() ?? 0;
+    }
+  }
+
+  return totalMinutes;
+}
 }
