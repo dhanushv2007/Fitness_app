@@ -40,7 +40,15 @@ class MealsScreen extends StatelessWidget {
             );
           }
 
-          final meals = snapshot.data ?? [];
+          final allMeals = snapshot.data ?? [];
+
+final today = DateTime.now();
+
+final meals = allMeals.where((meal) {
+  return meal.date.year == today.year &&
+      meal.date.month == today.month &&
+      meal.date.day == today.day;
+}).toList();
 
           int calories = 0;
           double protein = 0;

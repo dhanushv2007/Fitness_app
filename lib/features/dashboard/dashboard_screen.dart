@@ -13,6 +13,8 @@ import 'dashboard_card.dart';
 import '../meals/add_meal_screen.dart';
 import '../meals/models/meal_model.dart';
 import '../meals/services/meal_service.dart';
+import '../steps/step_screen.dart';
+import '../steps/step_service.dart';
 
 class DashboardScreen extends StatefulWidget {
   final VoidCallback? onRefresh;
@@ -30,10 +32,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
   final ProfileService _profileService = ProfileService();
   final DashboardService _dashboardService = DashboardService();
   final MealService _mealService = MealService();
+  final StepService _stepService = StepService();
 
 DashboardStats? dashboardStats;
 
 List<MealModel> todaysMeals = [];
+int todaySteps = 0;
 
 UserProfile? userProfile;
   bool isLoading = true;
@@ -44,6 +48,19 @@ void initState() {
 
   loadProfile();
   loadTodaysMeals();
+
+_stepService.startStepTracking(
+  onStepsChanged: (steps) {
+    if (!mounted) return;
+
+    setState(() {
+      todaySteps = steps;
+    });
+  },
+  onError: (error) {
+    debugPrint("Step error: $error");
+  },
+);
 }
 
   Future<void> loadProfile() async {
@@ -248,6 +265,11 @@ void didUpdateWidget(covariant DashboardScreen oldWidget) {
       ],
     ),
   );
+}
+@override
+void dispose() {
+  _stepService.dispose();
+  super.dispose();
 }
 
   Widget _progressItem(
@@ -552,7 +574,7 @@ Widget _quickAction(
       DashboardCard(
         title: "Water",
         value:
-            "${dashboardStats?.waterConsumed.toStringAsFixed(1) ?? 0} L",
+            "${dashboardStats?.waterConsumed.toStringAsFixed(2) ?? 0} L",
         icon: Icons.water_drop,
         color: Colors.blue,
         onTap: () {
@@ -580,12 +602,20 @@ Widget _quickAction(
         color: Colors.red,
       ),
 
-      DashboardCard(
-        title: "Steps",
-        value: "0",
-        icon: Icons.directions_walk,
-        color: Colors.deepPurple,
+     DashboardCard(
+  title: "Steps",
+  value: todaySteps.toString(), 
+  icon: Icons.directions_walk,
+  color: Colors.deepPurple,
+  onTap: () {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const StepScreen(),
       ),
+    );
+  },
+),
 
       DashboardCard(
         title: "Streak",
