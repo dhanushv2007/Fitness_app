@@ -16,6 +16,7 @@ import '../meals/services/meal_service.dart';
 import '../steps/step_screen.dart';
 import '../steps/step_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../sleep/sleep_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   final VoidCallback? onRefresh;
@@ -344,6 +345,7 @@ Widget _quickAction(
               fontWeight: FontWeight.bold,
             ),
           ),
+          
         ],
       ),
     ),
@@ -690,6 +692,81 @@ Container(
     ],
   ),
 ),
+const SizedBox(height: 30),
+
+const Text(
+  "Sleep",
+  style: TextStyle(
+    fontSize: 22,
+    fontWeight: FontWeight.bold,
+  ),
+),
+
+const SizedBox(height: 15),
+
+GestureDetector(
+  onTap: () {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const SleepScreen(),
+      ),
+    );
+  },
+  child: Container(
+    width: double.infinity,
+    padding: const EdgeInsets.all(20),
+    decoration: BoxDecoration(
+      color: Colors.deepPurple.shade50,
+      borderRadius: BorderRadius.circular(20),
+    ),
+    child: Row(
+      children: [
+        const CircleAvatar(
+          radius: 28,
+          backgroundColor: Colors.deepPurple,
+          child: Icon(
+            Icons.bedtime,
+            color: Colors.white,
+          ),
+        ),
+
+        const SizedBox(width: 18),
+
+        const Expanded(
+          child: Column(
+            crossAxisAlignment:
+                CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Sleep Tracking",
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+
+              SizedBox(height: 5),
+
+              Text(
+                "Track your sleep and recovery",
+                style: TextStyle(
+                  color: Colors.grey,
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        const Icon(
+          Icons.chevron_right,
+          color: Colors.deepPurple,
+        ),
+      ],
+    ),
+  ),
+),
+
 const SizedBox(height: 30),
 
 
