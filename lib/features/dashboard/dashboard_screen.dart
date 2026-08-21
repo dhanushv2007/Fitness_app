@@ -15,6 +15,7 @@ import '../meals/models/meal_model.dart';
 import '../meals/services/meal_service.dart';
 import '../steps/step_screen.dart';
 import '../steps/step_service.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class DashboardScreen extends StatefulWidget {
   final VoidCallback? onRefresh;
@@ -98,6 +99,7 @@ Future<void> loadTodaysMeals() async {
     todaysMeals = filteredMeals;
   });
 }
+
 
 double calculateBMI() {
   if (userProfile == null) return 0;
@@ -619,7 +621,7 @@ Widget _quickAction(
 
       DashboardCard(
         title: "Streak",
-        value: "1 Day",
+        value: "${dashboardStats?.streak ?? 0} Days",
         icon: Icons.emoji_events,
         color: Colors.amber,
       ),

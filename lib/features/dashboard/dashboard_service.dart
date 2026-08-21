@@ -77,13 +77,65 @@ final meals = await firestore
     // Return Dashboard Data
     // ==========================
 
-    return DashboardStats(
-      caloriesConsumed: caloriesConsumed,
-      calorieGoal: 2200.0,
-      waterConsumed: waterConsumed,
-      waterGoal: waterGoal,
-      steps: 0,
-      streak: 1,
-    );
+    // ==========================
+// Load Workout Streak
+// ==========================
+
+final workouts = await firestore
+    .collection('users')
+    .doc(uid)
+    .collection('workouts')
+    .get();
+
+final workoutDates = <DateTime>{};
+
+for (final doc in workouts.docs) {
+  final data = doc.data();
+
+  final dateString = data['date'];
+
+  if (dateString is String) {
+    final date = DateTime.tryParse(dateString);
+
+    if (date != null) {
+      workoutDates.add(
+        DateTime(
+          date.year,
+          date.month,
+          date.day,
+        ),
+      );
+    }
+  }
+}
+
+DateTime checkDate = DateTime(
+  now.year,
+  now.month,
+  now.day,
+);
+
+int streak = 0;
+
+while (workoutDates.contains(checkDate)) {
+  streak++;
+
+  checkDate = checkDate.subtract(
+    const Duration(days: 1),
+  );
+}
+
+// ==========================
+// Return Dashboard Data
+// ==========================
+
+return DashboardStats(
+  caloriesConsumed: caloriesConsumed,
+  calorieGoal: 2200.0,
+  waterConsumed: waterConsumed,
+  waterGoal: waterGoal,
+  steps: 0,
+  streak: streak,
+);
   }
 }
