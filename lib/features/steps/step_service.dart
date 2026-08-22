@@ -1,9 +1,16 @@
 import 'dart:async';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:pedometer/pedometer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class StepService {
+    final FirebaseFirestore firestore =
+      FirebaseFirestore.instance;
+
+  final FirebaseAuth auth =
+      FirebaseAuth.instance;
   StreamSubscription<StepCount>? _stepSubscription;
 
   int _todaySteps = 0;
@@ -30,28 +37,105 @@ class StepService {
         final currentSteps = event.steps;
 
         // New day
-        if (savedDate != todayKey) {
-          await prefs.setString("step_date", todayKey);
-          await prefs.setInt("step_start", currentSteps);
+        // New day
+if (savedDate != todayKey) {
+  // Save the previous day's final steps
+  if (savedDate != null && startSteps != null) {
+    int previousDaySteps = currentSteps - startSteps!;
 
-          startSteps = currentSteps;
-        }
+    if (previousDaySteps < 0) {
+      previousDaySteps = 0;
+    }
+
+    await saveStepsForDate(
+      savedDate,
+      previousDaySteps,
+    );
+  }
+
+  // Start counting the new day
+  await prefs.setString("step_date", todayKey);
+  await prefs.setInt("step_start", currentSteps);
+
+  startSteps = currentSteps;
+}
 
         startSteps ??= currentSteps;
 
         _todaySteps = currentSteps - startSteps!;
 
-        if (_todaySteps < 0) {
-          _todaySteps = 0;
-        }
+if (_todaySteps < 0) {
+  _todaySteps = 0;
+}
 
-        onStepsChanged(_todaySteps);
+await saveTodaySteps(_todaySteps);
+
+onStepsChanged(_todaySteps);
       },
       onError: (error) {
         onError(error.toString());
       },
     );
   }
+    Future<void> saveTodaySteps(int steps) async {
+    final user = auth.currentUser;
+
+    if (user == null) return;
+
+    final now = DateTime.now();
+
+    final dateKey =
+        "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
+
+    await firestore
+        .collection('users')
+        .doc(user.uid)
+        .collection('stepHistory')
+        .doc(dateKey)
+        .set({
+      'date': dateKey,
+      'steps': steps,
+      'updatedAt': FieldValue.serverTimestamp(),
+    }, SetOptions(merge: true));
+  }
+    Future<List<Map<String, dynamic>>> getStepHistory() async {
+    final user = auth.currentUser;
+
+    if (user == null) {
+      return [];
+    }
+
+    final snapshot = await firestore
+        .collection('users')
+        .doc(user.uid)
+        .collection('stepHistory')
+        .orderBy('date', descending: true)
+        .limit(7)
+        .get();
+
+    return snapshot.docs
+        .map((doc) => doc.data())
+        .toList();
+  }
+  Future<void> saveStepsForDate(
+  String date,
+  int steps,
+) async {
+  final user = auth.currentUser;
+
+  if (user == null) return;
+
+  await firestore
+      .collection('users')
+      .doc(user.uid)
+      .collection('stepHistory')
+      .doc(date)
+      .set({
+    'date': date,
+    'steps': steps,
+    'updatedAt': FieldValue.serverTimestamp(),
+  }, SetOptions(merge: true));
+}
 
   Future<void> stopStepTracking() async {
     await _stepSubscription?.cancel();
