@@ -18,13 +18,15 @@ class DashboardCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(25),
       child: Container(
         padding: const EdgeInsets.all(18),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: theme.cardColor,
           borderRadius: BorderRadius.circular(25),
           boxShadow: [
             BoxShadow(
@@ -37,7 +39,6 @@ class DashboardCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
@@ -56,7 +57,7 @@ class DashboardCard extends StatelessWidget {
             Text(
               title,
               style: TextStyle(
-                color: Colors.grey.shade600,
+                color: theme.colorScheme.onSurfaceVariant,
                 fontSize: 15,
               ),
             ),
@@ -65,7 +66,8 @@ class DashboardCard extends StatelessWidget {
 
             Text(
               value,
-              style: const TextStyle(
+              style: TextStyle(
+                color: theme.colorScheme.onSurface,
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
               ),

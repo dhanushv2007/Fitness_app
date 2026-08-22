@@ -256,7 +256,7 @@ class _AddSleepScreenState extends State<AddSleepScreen> {
 
           // Duration
           Card(
-            color: Colors.deepPurple.shade50,
+            color: Theme.of(context).colorScheme.surfaceContainerHighest,
             child: Padding(
               padding: const EdgeInsets.all(25),
               child: Column(

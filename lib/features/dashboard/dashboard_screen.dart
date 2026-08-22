@@ -159,7 +159,7 @@ double calculateBMI() {
     margin: const EdgeInsets.only(bottom: 15),
     padding: const EdgeInsets.all(18),
     decoration: BoxDecoration(
-      color: Colors.white,
+      color: Theme.of(context).cardColor,
       borderRadius: BorderRadius.circular(20),
       boxShadow: [
         BoxShadow(
@@ -188,7 +188,7 @@ double calculateBMI() {
             children: [
               Text(
                 title,
-                style: const TextStyle(
+                style:  TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 18,
                 ),
@@ -197,7 +197,7 @@ double calculateBMI() {
               const SizedBox(height: 5),
 
               if (mealsForType.isEmpty)
-                const Text(
+                Text(
                   "No meal added today",
                   style: TextStyle(
                     color: Colors.grey,
@@ -210,8 +210,8 @@ double calculateBMI() {
                       .join(", "),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: Colors.black87,
+                  style:  TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
 
@@ -297,7 +297,7 @@ void dispose() {
 
       Text(
         value,
-        style: const TextStyle(
+        style:  TextStyle(
           fontSize: 20,
           fontWeight: FontWeight.bold,
         ),
@@ -305,7 +305,7 @@ void dispose() {
 
       Text(
         title,
-        style: const TextStyle(
+        style:  TextStyle(
           color: Colors.grey,
         ),
       ),
@@ -335,13 +335,13 @@ Widget _quickAction(
             backgroundColor: color,
             child: Icon(
               icon,
-              color: Colors.white,
+              color: Theme.of(context).cardColor,
             ),
           ),
           const SizedBox(height: 10),
           Text(
             title,
-            style: const TextStyle(
+            style: TextStyle(
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -361,12 +361,12 @@ Widget _quickAction(
     }
 
     return Scaffold(
-      backgroundColor: const Color(0xffF5F7FA),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
   elevation: 0,
   backgroundColor: Colors.transparent,
   surfaceTintColor: Colors.transparent,
-  title: const Text(
+  title: Text(
     "Dashboard",
     style: TextStyle(
       fontSize: 28,
@@ -418,9 +418,10 @@ Widget _quickAction(
 
       Row(
         children: [
-          const CircleAvatar(
+          CircleAvatar(
             radius: 28,
-            backgroundColor: Colors.white,
+            backgroundColor:
+    Theme.of(context).scaffoldBackgroundColor,
             child: Icon(
               Icons.person,
               color: Colors.green,
@@ -437,20 +438,21 @@ Widget _quickAction(
 
                 Text(
                   greeting(),
-                  style: const TextStyle(
-                    color: Colors.white70,
-                    fontSize: 16,
+                  style: TextStyle(
+  color: Theme.of(context).colorScheme.onPrimary,
+  fontSize: 16,
+),
                   ),
-                ),
+                
 
                 Text(
-                  userProfile?.name ?? "User",
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 28,
-                  ),
-                ),
+  userProfile?.name ?? "User",
+  style: TextStyle(
+    color: Theme.of(context).colorScheme.onPrimary,
+    fontWeight: FontWeight.bold,
+    fontSize: 28,
+  ),
+),
               ],
             ),
           ),
@@ -459,10 +461,10 @@ Widget _quickAction(
 
       const SizedBox(height: 30),
 
-      const Text(
+       Text(
         "Today's Calories",
         style: TextStyle(
-          color: Colors.white70,
+          color: Theme.of(context).cardColor,
           fontSize: 15,
         ),
       ),
@@ -483,12 +485,13 @@ Widget _quickAction(
         "${(((dashboardStats?.caloriesConsumed ?? 0) /
                 calculateDailyCalories()) *
             100).toStringAsFixed(0)}%",
-        style: const TextStyle(
+        style: TextStyle(
           fontWeight: FontWeight.bold,
         ),
       ),
       progressColor: Colors.white,
-      backgroundColor: Colors.white24,
+      backgroundColor:
+    Theme.of(context).scaffoldBackgroundColor,
       circularStrokeCap: CircularStrokeCap.round,
     ),
 
@@ -499,10 +502,10 @@ Widget _quickAction(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
 
-          const Text(
+          Text(
             "Today's Goal",
             style: TextStyle(
-              color: Colors.white70,
+              color: Theme.of(context).cardColor,
               fontSize: 16,
             ),
           ),
@@ -511,8 +514,8 @@ Widget _quickAction(
 
           Text(
   "${((dashboardStats?.caloriesConsumed ?? 0) / calculateDailyCalories() * 100).clamp(0, 100).toStringAsFixed(0)}% of today's goal completed",
-  style: const TextStyle(
-    color: Colors.white,
+  style: TextStyle(
+    color: Theme.of(context).colorScheme.onPrimary,
     fontSize: 18,
     fontWeight: FontWeight.w600,
   ),
@@ -520,10 +523,10 @@ Widget _quickAction(
 
           const SizedBox(height: 6),
 
-          const Text(
+          Text(
             "Keep going! 💪",
             style: TextStyle(
-              color: Colors.white70,
+              color: Theme.of(context).cardColor,
             ),
           ),
         ],
@@ -539,10 +542,10 @@ Widget _quickAction(
 
       const SizedBox(height: 8),
 
-      const Text(
+      Text(
         "Stay consistent. Every workout counts! 💪",
         style: TextStyle(
-          color: Colors.white70,
+          color: Theme.of(context).cardColor,
         ),
       ),
     ],
@@ -635,7 +638,7 @@ Widget _quickAction(
 ),
 const SizedBox(height: 30),
 
-const Text(
+Text(
   "Weekly Progress",
   style: TextStyle(
     fontSize: 22,
@@ -649,7 +652,7 @@ Container(
   width: double.infinity,
   padding: const EdgeInsets.all(20),
   decoration: BoxDecoration(
-    color: Colors.white,
+    color: Theme.of(context).cardColor,
     borderRadius: BorderRadius.circular(25),
     boxShadow: [
       BoxShadow(
@@ -694,7 +697,7 @@ Container(
 ),
 const SizedBox(height: 30),
 
-const Text(
+Text(
   "Sleep",
   style: TextStyle(
     fontSize: 22,
@@ -717,19 +720,19 @@ GestureDetector(
     width: double.infinity,
     padding: const EdgeInsets.all(20),
     decoration: BoxDecoration(
-      color: Colors.deepPurple.shade50,
+      color: Theme.of(context).colorScheme.surfaceContainerHighest,
       borderRadius: BorderRadius.circular(20),
     ),
     child: Row(
       children: [
-        const CircleAvatar(
-          radius: 28,
-          backgroundColor: Colors.deepPurple,
-          child: Icon(
-            Icons.bedtime,
-            color: Colors.white,
-          ),
-        ),
+        CircleAvatar(
+  radius: 28,
+  backgroundColor: Colors.deepPurple,
+  child: Icon(
+    Icons.bedtime,
+    color: Theme.of(context).colorScheme.onPrimary,
+  ),
+),
 
         const SizedBox(width: 18),
 
@@ -777,7 +780,7 @@ const SizedBox(height: 15),
 Row(
   mainAxisAlignment: MainAxisAlignment.spaceBetween,
   children: [
-    const Text(
+    Text(
       "Today's Meals",
       style: TextStyle(
         fontSize: 22,
@@ -786,7 +789,7 @@ Row(
     ),
     TextButton(
       onPressed: () {},
-      child: const Text("View All"),
+      child:const Text("View All"),
     ),
   ],
 ),
@@ -828,7 +831,7 @@ const SizedBox(height: 24),
             Row(
   mainAxisAlignment: MainAxisAlignment.spaceBetween,
   children: [
-    const Text(
+    Text(
       "Today's Workout",
       style: TextStyle(
         fontSize: 22,

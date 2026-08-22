@@ -19,20 +19,43 @@ class WorkoutService {
   }
 
   Stream<List<WorkoutModel>> getWorkouts() {
-    final uid = auth.currentUser!.uid;
+  final uid = auth.currentUser!.uid;
 
-    return firestore
-        .collection('users')
-        .doc(uid)
-        .collection('workouts')
-        .orderBy('date', descending: true)
-        .snapshots()
-        .map(
-          (snapshot) => snapshot.docs
-              .map((doc) => WorkoutModel.fromMap(doc.data()))
-              .toList(),
-        );
-  }
+  final now = DateTime.now();
+
+  final startOfDay = DateTime(
+    now.year,
+    now.month,
+    now.day,
+  );
+
+  final endOfDay = startOfDay.add(
+    const Duration(days: 1),
+  );
+
+  return firestore
+      .collection('users')
+      .doc(uid)
+      .collection('workouts')
+      .where(
+        'date',
+        isGreaterThanOrEqualTo: startOfDay.toIso8601String(),
+      )
+      .where(
+        'date',
+        isLessThan: endOfDay.toIso8601String(),
+      )
+      .snapshots()
+      .map(
+        (snapshot) => snapshot.docs
+            .map(
+              (doc) => WorkoutModel.fromMap(
+                doc.data(),
+              ),
+            )
+            .toList(),
+      );
+}
 
   Future<void> deleteWorkout(String id) async {
     final uid = auth.currentUser!.uid;
