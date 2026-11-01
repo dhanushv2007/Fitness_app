@@ -1,6 +1,10 @@
+<<<<<<< HEAD
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import '../../core/theme/theme_controller.dart';
+=======
+import 'package:flutter/material.dart';
+>>>>>>> 8c6adcddfc657ba0464891256e4e0998a4836294
 
 class DashboardCard extends StatelessWidget {
   final String title;
@@ -21,6 +25,7 @@ class DashboardCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+<<<<<<< HEAD
     final isGlass = themeController.glassTheme;
 
     return TweenAnimationBuilder<double>(
@@ -147,8 +152,68 @@ class DashboardCard extends StatelessWidget {
               ),
             ),
           ),
+=======
+
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(25),
+      child: Container(
+        padding: const EdgeInsets.all(18),
+        decoration: BoxDecoration(
+          color: theme.cardColor,
+          borderRadius: BorderRadius.circular(25),
+          boxShadow: [
+            BoxShadow(
+              color: color.withOpacity(.15),
+              blurRadius: 18,
+              offset: const Offset(0, 8),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: color.withOpacity(.12),
+                borderRadius: BorderRadius.circular(15),
+              ),
+              child: Icon(
+                icon,
+                color: color,
+                size: 28,
+              ),
+            ),
+
+            const Spacer(),
+
+            Text(
+              title,
+              style: TextStyle(
+                color: theme.colorScheme.onSurfaceVariant,
+                fontSize: 15,
+              ),
+            ),
+
+            const SizedBox(height: 6),
+
+            Text(
+              value,
+              style: TextStyle(
+                color: theme.colorScheme.onSurface,
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+>>>>>>> 8c6adcddfc657ba0464891256e4e0998a4836294
         ),
       ),
     );
   }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 8c6adcddfc657ba0464891256e4e0998a4836294

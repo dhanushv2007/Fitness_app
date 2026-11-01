@@ -233,11 +233,17 @@ class ProfileScreen extends StatelessWidget {
                     iconColor: Colors.deepPurple,
                     title: "App Theme",
                     subtitle: _currentThemeName(),
+<<<<<<< HEAD
                     
                     onTap: () {
   _showThemeSelector(context);
 },
                     
+=======
+                    onTap: () {
+                      _showThemeSelector(context);
+                    },
+>>>>>>> 8c6adcddfc657ba0464891256e4e0998a4836294
                   ),
                 ],
               ),
@@ -418,6 +424,7 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
+<<<<<<< HEAD
 String _currentThemeName() {
   if (themeController.glassTheme) {
     return "Transparent Glass";
@@ -681,3 +688,177 @@ String _currentThemeName() {
               
 
 }
+=======
+  String _currentThemeName() {
+    if (themeController.oceanTheme) {
+      return "Ocean";
+    }
+
+    if (themeController.themeMode ==
+        ThemeMode.dark) {
+      return "Dark";
+    }
+
+    return "Light";
+  }
+
+  void _showThemeSelector(
+    BuildContext context,
+  ) {
+    showModalBottomSheet(
+      context: context,
+      showDragHandle: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(28),
+        ),
+      ),
+      builder: (context) {
+        return AnimatedBuilder(
+          animation: themeController,
+          builder: (context, _) {
+            return Padding(
+              padding: const EdgeInsets.fromLTRB(
+                20,
+                5,
+                20,
+                30,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment:
+                    CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    "Choose Theme",
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    "Personalize the look of your app",
+                    style: TextStyle(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurfaceVariant,
+                    ),
+                  ),
+                  const SizedBox(height: 18),
+
+                  _themeOption(
+                    context,
+                    icon: Icons.light_mode,
+                    title: "Light",
+                    subtitle:
+                        "Classic green fitness theme",
+                    selected:
+                        !themeController.oceanTheme &&
+                            themeController
+                                    .themeMode ==
+                                ThemeMode.light,
+                    color: Colors.green,
+                    onTap: () {
+                      themeController.setTheme(
+                        ThemeMode.light,
+                      );
+                      Navigator.pop(context);
+                    },
+                  ),
+
+                  _themeOption(
+                    context,
+                    icon: Icons.dark_mode,
+                    title: "Dark",
+                    subtitle:
+                        "Comfortable for night use",
+                    selected:
+                        !themeController.oceanTheme &&
+                            themeController
+                                    .themeMode ==
+                                ThemeMode.dark,
+                    color: Colors.deepPurple,
+                    onTap: () {
+                      themeController.setTheme(
+                        ThemeMode.dark,
+                      );
+                      Navigator.pop(context);
+                    },
+                  ),
+
+                  _themeOption(
+                    context,
+                    icon: Icons.water_drop,
+                    title: "Ocean",
+                    subtitle:
+                        "Clean blue fitness theme",
+                    selected:
+                        themeController.oceanTheme,
+                    color: Colors.blue,
+                    onTap: () {
+                      themeController.setOceanTheme();
+                      Navigator.pop(context);
+                    },
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _themeOption(
+    BuildContext context, {
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required bool selected,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      decoration: BoxDecoration(
+        color: selected
+            ? color.withOpacity(0.10)
+            : Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(
+          color:
+              selected ? color : Colors.transparent,
+          width: 1.5,
+        ),
+      ),
+      child: ListTile(
+        onTap: onTap,
+        leading: CircleAvatar(
+          backgroundColor: color.withOpacity(0.12),
+          child: Icon(
+            icon,
+            color: color,
+          ),
+        ),
+        title: Text(
+          title,
+          style: const TextStyle(
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        subtitle: Text(subtitle),
+        trailing: selected
+            ? Icon(
+                Icons.check_circle,
+                color: color,
+              )
+            : const Icon(
+                Icons.radio_button_unchecked,
+                color: Colors.grey,
+              ),
+      ),
+    );
+  }
+}
+>>>>>>> 8c6adcddfc657ba0464891256e4e0998a4836294

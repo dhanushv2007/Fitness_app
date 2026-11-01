@@ -1,7 +1,12 @@
+<<<<<<< HEAD
 import 'dart:async';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import '../../core/theme/theme_controller.dart';
+=======
+
+import 'package:flutter/material.dart';
+>>>>>>> 8c6adcddfc657ba0464891256e4e0998a4836294
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import '../water/water_screen.dart';
@@ -32,14 +37,19 @@ class DashboardScreen extends StatefulWidget {
   State<DashboardScreen> createState() => _DashboardScreenState();
 }
 
+<<<<<<< HEAD
 
 class _DashboardScreenState extends State<DashboardScreen>
     with SingleTickerProviderStateMixin {
+=======
+class _DashboardScreenState extends State<DashboardScreen> {
+>>>>>>> 8c6adcddfc657ba0464891256e4e0998a4836294
   final ProfileService _profileService = ProfileService();
   final DashboardService _dashboardService = DashboardService();
   final MealService _mealService = MealService();
   final StepService _stepService = StepService();
 
+<<<<<<< HEAD
   DashboardStats? dashboardStats;
   List<MealModel> todaysMeals = [];
   int todaySteps = 0;
@@ -75,19 +85,58 @@ class _DashboardScreenState extends State<DashboardScreen>
       },
     );
   }
+=======
+DashboardStats? dashboardStats;
+
+List<MealModel> todaysMeals = [];
+int todaySteps = 0;
+
+UserProfile? userProfile;
+  bool isLoading = true;
+
+ @override
+void initState() {
+  super.initState();
+
+  loadProfile();
+  loadTodaysMeals();
+
+_stepService.startStepTracking(
+  onStepsChanged: (steps) {
+    if (!mounted) return;
+
+    setState(() {
+      todaySteps = steps;
+    });
+  },
+  onError: (error) {
+    debugPrint("Step error: $error");
+  },
+);
+}
+>>>>>>> 8c6adcddfc657ba0464891256e4e0998a4836294
 
   Future<void> loadProfile() async {
     try {
       final profile = await _profileService.getProfile();
+<<<<<<< HEAD
 
       if (!mounted) return;
 
       setState(() {
         userProfile = profile;
+=======
+      final stats = await _dashboardService.loadDashboard();
+      if (!mounted) return;
+      setState(() {
+        userProfile = profile;
+        dashboardStats = stats;
+>>>>>>> 8c6adcddfc657ba0464891256e4e0998a4836294
         isLoading = false;
       });
     } catch (e) {
       if (!mounted) return;
+<<<<<<< HEAD
 
       setState(() {
         isLoading = false;
@@ -170,11 +219,65 @@ class _DashboardScreenState extends State<DashboardScreen>
     if (hour < 12) return "Good Morning";
     if (hour < 17) return "Good Afternoon";
 
+=======
+      setState(() => isLoading = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error: $e")),
+      );
+    }
+  }
+Future<void> loadTodaysMeals() async {
+  final meals = await _mealService.getMeals().first;
+
+  final today = DateTime.now();
+
+  final filteredMeals = meals.where((meal) {
+    return meal.date.year == today.year &&
+        meal.date.month == today.month &&
+        meal.date.day == today.day;
+  }).toList();
+
+  if (!mounted) return;
+
+  setState(() {
+    todaysMeals = filteredMeals;
+  });
+}
+
+
+double calculateBMI() {
+  if (userProfile == null) return 0;
+
+  final heightInMeters = userProfile!.height / 100;
+
+  return userProfile!.weight /
+      (heightInMeters * heightInMeters);
+}
+
+  double calculateDailyCalories() {
+  if (userProfile == null) return 0;
+
+  return CalorieCalculator.calculateCalories(
+    age: userProfile!.age,
+    height: userProfile!.height,
+    weight: userProfile!.weight,
+    gender: userProfile!.gender,
+    goal: userProfile!.goal,
+    activityLevel: userProfile!.activityLevel,
+  );
+}
+
+  String greeting() {
+    final hour = DateTime.now().hour;
+    if (hour < 12) return "Good Morning";
+    if (hour < 17) return "Good Afternoon";
+>>>>>>> 8c6adcddfc657ba0464891256e4e0998a4836294
     return "Good Evening";
   }
 
   Future<void> logout() async {
     await FirebaseAuth.instance.signOut();
+<<<<<<< HEAD
 
     if (!mounted) return;
 
@@ -183,11 +286,18 @@ class _DashboardScreenState extends State<DashboardScreen>
       MaterialPageRoute(
         builder: (_) => const LoginScreen(),
       ),
+=======
+    if (!mounted) return;
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (_) => const LoginScreen()),
+>>>>>>> 8c6adcddfc657ba0464891256e4e0998a4836294
       (_) => false,
     );
   }
 
   Widget mealCard(
+<<<<<<< HEAD
     IconData icon,
     String title,
     Color color,
@@ -321,6 +431,140 @@ class _DashboardScreenState extends State<DashboardScreen>
     super.dispose();
   }
 
+=======
+  IconData icon,
+  String title,
+  Color color,
+) {
+  final mealsForType = todaysMeals
+      .where((meal) => meal.mealType == title)
+      .toList();
+
+  final totalCalories = mealsForType.fold<int>(
+    0,
+    (sum, meal) => sum + meal.calories,
+  );
+
+  return Container(
+    margin: const EdgeInsets.only(bottom: 15),
+    padding: const EdgeInsets.all(18),
+    decoration: BoxDecoration(
+      color: Theme.of(context).cardColor,
+      borderRadius: BorderRadius.circular(20),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withOpacity(.05),
+          blurRadius: 12,
+          offset: const Offset(0, 5),
+        ),
+      ],
+    ),
+    child: Row(
+      children: [
+        CircleAvatar(
+          radius: 25,
+          backgroundColor: color.withOpacity(.15),
+          child: Icon(
+            icon,
+            color: color,
+          ),
+        ),
+
+        const SizedBox(width: 18),
+
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style:  TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                ),
+              ),
+
+              const SizedBox(height: 5),
+
+              if (mealsForType.isEmpty)
+                Text(
+                  "No meal added today",
+                  style: TextStyle(
+                    color: Colors.grey,
+                  ),
+                )
+              else ...[
+                Text(
+                  mealsForType
+                      .map((meal) => meal.foodName)
+                      .join(", "),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style:  TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                ),
+
+                const SizedBox(height: 4),
+
+                Text(
+                  "$totalCalories kcal",
+                  style: TextStyle(
+                    color: color,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+
+        Container(
+          decoration: BoxDecoration(
+            color: color.withOpacity(.12),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: IconButton(
+            icon: Icon(
+              Icons.add,
+              color: color,
+            ),
+            onPressed: () async {
+              await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => AddMealScreen(
+                    initialMealType: title,
+                  ),
+                ),
+              );
+
+  Future<void> refreshDashboard() async {
+  await loadProfile();
+  await loadTodaysMeals();
+
+  @override
+void didUpdateWidget(covariant DashboardScreen oldWidget) {
+  super.didUpdateWidget(oldWidget);
+
+  if (widget.onRefresh != oldWidget.onRefresh) {
+    widget.onRefresh?.call();
+  }
+}
+}
+            },
+          ),
+        ),
+      ],
+    ),
+  );
+}
+@override
+void dispose() {
+  _stepService.dispose();
+  super.dispose();
+}
+>>>>>>> 8c6adcddfc657ba0464891256e4e0998a4836294
 
   Widget _progressItem(
   String title,
@@ -433,6 +677,7 @@ Widget _quickAction(
     ),
   ],
 ),
+<<<<<<< HEAD
       body: Stack(
         children: [
           if (themeController.glassTheme)
@@ -488,6 +733,10 @@ Widget _quickAction(
             ),
           SingleChildScrollView(
             padding: const EdgeInsets.all(20),
+=======
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(20),
+>>>>>>> 8c6adcddfc657ba0464891256e4e0998a4836294
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -496,6 +745,7 @@ Widget _quickAction(
   padding: const EdgeInsets.all(25),
   decoration: BoxDecoration(
     borderRadius: BorderRadius.circular(30),
+<<<<<<< HEAD
     gradient: themeController.glassTheme
         ? LinearGradient(
             begin: Alignment.topLeft,
@@ -511,6 +761,16 @@ Widget _quickAction(
             end: Alignment.bottomRight,
             colors: [Color(0xff22C55E), Color(0xff15803D)],
           ),
+=======
+    gradient: const LinearGradient(
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+      colors: [
+        Color(0xff22C55E),
+        Color(0xff15803D),
+      ],
+    ),
+>>>>>>> 8c6adcddfc657ba0464891256e4e0998a4836294
     boxShadow: [
       BoxShadow(
         color: Colors.green.withOpacity(0.35),
@@ -963,6 +1223,7 @@ const SizedBox(height: 24),
             ),
             const SizedBox(height:30),
           ],
+<<<<<<< HEAD
           ),
           ),
         ],
@@ -979,6 +1240,8 @@ const SizedBox(height: 24),
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           color: color,
+=======
+>>>>>>> 8c6adcddfc657ba0464891256e4e0998a4836294
         ),
       ),
     );

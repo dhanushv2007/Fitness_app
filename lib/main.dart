@@ -1,10 +1,17 @@
+<<<<<<< HEAD
 
+=======
+import 'core/theme/theme_controller.dart';
+>>>>>>> 8c6adcddfc657ba0464891256e4e0998a4836294
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 import 'firebase_options.dart';
 import 'core/theme/app_theme.dart';
+<<<<<<< HEAD
 import 'core/theme/theme_controller.dart';
+=======
+>>>>>>> 8c6adcddfc657ba0464891256e4e0998a4836294
 import 'features/auth/services/auth_wrapper.dart';
 
 void main() async {
@@ -27,6 +34,7 @@ class FitnessApp extends StatefulWidget {
 }
 
 class _FitnessAppState extends State<FitnessApp> {
+<<<<<<< HEAD
   @override
   void initState() {
     super.initState();
@@ -44,6 +52,9 @@ class _FitnessAppState extends State<FitnessApp> {
     themeController.removeListener(_onThemeChanged);
     super.dispose();
   }
+=======
+  
+>>>>>>> 8c6adcddfc657ba0464891256e4e0998a4836294
 
   @override
   Widget build(BuildContext context) {
@@ -51,6 +62,7 @@ class _FitnessAppState extends State<FitnessApp> {
       debugShowCheckedModeBanner: false,
       title: 'Fitness App',
 
+<<<<<<< HEAD
       theme: themeController.glassTheme
           ? AppTheme.glassTheme
           : themeController.oceanTheme
@@ -63,8 +75,19 @@ class _FitnessAppState extends State<FitnessApp> {
               themeController.oceanTheme)
           ? ThemeMode.light
           : themeController.themeMode,
+=======
+      theme: AppTheme.lightTheme,
+
+      darkTheme: AppTheme.darkTheme,
+
+      themeMode: themeController.themeMode,
+>>>>>>> 8c6adcddfc657ba0464891256e4e0998a4836294
 
       home: const AuthWrapper(),
     );
   }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 8c6adcddfc657ba0464891256e4e0998a4836294

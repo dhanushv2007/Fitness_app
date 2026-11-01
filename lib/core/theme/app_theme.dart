@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 
 import 'package:flutter/material.dart';
 
@@ -11,31 +12,72 @@ class AppTheme {
   );
 
   // DARK THEME
+=======
+import 'package:flutter/material.dart';
+
+class AppTheme {
+  // ☀️ LIGHT THEME
+  static ThemeData lightTheme = ThemeData(
+    useMaterial3: true,
+    colorSchemeSeed: Colors.green,
+    scaffoldBackgroundColor: Colors.white,
+    brightness: Brightness.light,
+  );
+
+  // 🌙 DARK THEME
+>>>>>>> 8c6adcddfc657ba0464891256e4e0998a4836294
   static ThemeData darkTheme = ThemeData(
     useMaterial3: true,
     colorSchemeSeed: Colors.green,
     brightness: Brightness.dark,
     scaffoldBackgroundColor: const Color(0xFF121212),
+<<<<<<< HEAD
+=======
+
+>>>>>>> 8c6adcddfc657ba0464891256e4e0998a4836294
     cardTheme: CardThemeData(
       elevation: 3,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(18),
       ),
     ),
+<<<<<<< HEAD
   );
 
   // OCEAN THEME
+=======
+
+    appBarTheme: const AppBarTheme(
+      centerTitle: false,
+    ),
+
+    navigationBarTheme: NavigationBarThemeData(
+      elevation: 3,
+      height: 70,
+      indicatorShape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15),
+      ),
+    ),
+  );
+
+  // 🔵 OCEAN THEME
+>>>>>>> 8c6adcddfc657ba0464891256e4e0998a4836294
   static ThemeData oceanTheme = ThemeData(
     useMaterial3: true,
     colorSchemeSeed: Colors.blue,
     brightness: Brightness.light,
     scaffoldBackgroundColor: const Color(0xFFF4F9FF),
+<<<<<<< HEAD
+=======
+
+>>>>>>> 8c6adcddfc657ba0464891256e4e0998a4836294
     cardTheme: CardThemeData(
       elevation: 3,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(18),
       ),
     ),
+<<<<<<< HEAD
   );
 
   // TRANSPARENT GLASS THEME
@@ -67,10 +109,15 @@ class AppTheme {
       backgroundColor: Colors.transparent,
       surfaceTintColor: Colors.transparent,
       elevation: 0,
+=======
+
+    appBarTheme: const AppBarTheme(
+>>>>>>> 8c6adcddfc657ba0464891256e4e0998a4836294
       centerTitle: false,
     ),
 
     navigationBarTheme: NavigationBarThemeData(
+<<<<<<< HEAD
       backgroundColor: const Color(0xBFFFFFFF),
       elevation: 0,
       height: 75,
@@ -95,3 +142,13 @@ class AppTheme {
     ),
   );
 }
+=======
+      elevation: 3,
+      height: 70,
+      indicatorShape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15),
+      ),
+    ),
+  );
+}
+>>>>>>> 8c6adcddfc657ba0464891256e4e0998a4836294
